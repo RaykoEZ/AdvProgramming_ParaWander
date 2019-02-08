@@ -1,0 +1,63 @@
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+# qt files
+*.pro.user*
+.qmake*
+moc/
+moc_*
+ui_*
+*.release
+*.debug
+# shadow build directories
+build-*
+Makefile
+# Compiled Dynamic libraries
+*.so
+*.so.*
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+*.ilk
+
+# debug
+
+*.pdb
+
+# Visual Studio 
+*.vcproj
+*.vcxproj
+*.sln
+*.user
+*.filters
+
+# Executables
+*.exe
+*.out
+# image files
+*.psd
+
+*.app
+# temp files under linux
+*.~*
+#bzr files
+.bzr/
+#zips and tgz
+*.tgz
+*.zip
+*.tar.gz
+#Cmake
+
+CMakeCache.txt
+CMakeFiles
+CMakeScripts
+Makefile
+cmake_install.cmake
+install_manifest.txt
