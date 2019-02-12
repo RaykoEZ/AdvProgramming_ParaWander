@@ -1,9 +1,9 @@
 QT       += core
-TARGET = FlockGPU
+TARGET = FlockCPU
 
 # where to put moc auto generated files
 MOC_DIR=moc
-DEFINES += FLOCKGPU_LIBRARY
+DEFINES += FLOCKCPU_LIBRARY
 OBJECTS_DIR=obj
 # as I want to support 4.8 and 5 this will set a flag for some of the mac stuff
 # mainly in the types.h file for the setMacVisual which is native in Qt5

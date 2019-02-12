@@ -1,10 +1,20 @@
-QT       += core
-TARGET = FlockGPU
-
+QT      += core testlib
+TARGET = FlockTest
+# TEMPLATE = app
+CONFIG += console c++11
+CONFIG -= app_bundle
 # where to put moc auto generated files
-MOC_DIR=moc
-DEFINES += FLOCKGPU_LIBRARY
+MOC_DIR = moc
+DEFINES += FLOCK_TEST
 OBJECTS_DIR=obj
+
+# and add the include dir into the search path for Qt and make
+INCLUDEPATH +=./include \
+              $$PWD/../FlockGPU/include \
+              $$PWD/../FlockCPU/include \
+
+
+SOURCES += $$PWD/src/main.cpp
 # as I want to support 4.8 and 5 this will set a flag for some of the mac stuff
 # mainly in the types.h file for the setMacVisual which is native in Qt5
 isEqual(QT_MAJOR_VERSION, 5) {
@@ -16,21 +26,7 @@ isEqual(QT_MAJOR_VERSION, 5) {
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-TEMPLATE = lib
-CONFIG += staticlib
-
-
-# You can also make your code fail to compile if you use deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-# on a mac we don't create a .app bundle file ( for ease of multiplatform use)
 CONFIG-=app_bundle
 
-# and add the include dir into the search path for Qt and make
-INCLUDEPATH +=./include
 # where our exe is going to live (root of project)
 DESTDIR=./
-
-SOURCES += \
-    $$PWD/src/main.cpp
