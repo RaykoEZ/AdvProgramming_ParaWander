@@ -1,5 +1,7 @@
 #ifndef WORLD_H
 #define WORLD_H
+#include "Boid.h"
+
 class  World
 {
 

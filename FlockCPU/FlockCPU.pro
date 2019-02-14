@@ -49,7 +49,7 @@ CONFIG += console
 win32:
 {
     # GLM AT HOME
-    INCLUDEPATH+= $$PWD/../../glm
+    INCLUDEPATH+= $$PWD/../../../glm
 }
 
 

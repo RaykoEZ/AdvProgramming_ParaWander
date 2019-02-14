@@ -16,31 +16,22 @@ void Boid::beginPlay()
     //UE_LOG(LogTemp, Warning, TEXT("RootLoc : (%f , %f, %f)"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
 }
 
-/*
+
 /// movement of boid every frame
 void Boid::update(const float &_dt)
 {
-    // test for seek and flee
 
-    FVector desiredV = m_target - m_pos;
-    FVector outV = desiredV.GetSafeNormal();
-    //FVector f = flee();
 
-    FVector f = seek();
+    glm::vec3 f = seek();
 
-    FVector accel = f * m_invMass;
-    FVector oldV = m_v + accel;
-    m_v = ClampVector(oldV, FVector(-m_vMax*0.5f), FVector(m_vMax));
-    m_pos += m_v;
-    m_mesh->SetWorldLocation(m_pos);
-    RootComponent->SetWorldLocation(m_pos);
-    //SetActorLocation(m_pos);
-    //UE_LOG(LogTemp, Warning, TEXT("m_pos : (%f , %f, %f)"), m_pos.X, m_pos.Y, m_pos.Z);
-    //UE_LOG(LogTemp, Warning, TEXT("dir : (%f , %f, %f)"), m_v.X, m_v.Y, m_v.Z);
+    glm::vec3 accel = f * m_invMass;
+    glm::vec3 oldV = m_v + accel;
+    m_v = glm::clamp(oldV, glm::vec3(-m_vMax*0.5f), glm::vec3(m_vMax));
+    m_pos += m_v * _dt;
 
 
 }
-
+/*
 void Boid::handleStatus()
 {
 }
@@ -67,47 +58,44 @@ void Boid::tick(float DeltaTime)
 void Boid::resolve(const FVector &_f)
 {
 
-    FVector desiredV = m_target - m_pos;
-    FVector outV = desiredV.GetSafeNormal();
-    FVector accel = _f * m_invMass;
-    FVector oldV = m_v + accel;
+    glm::vec3 desiredV = m_target - m_pos;
+    glm::vec3 outV = desiredV.GetSafeNormal();
+    glm::vec3 accel = _f * m_invMass;
+    glm::vec3 oldV = m_v + accel;
 
-    m_v = ClampVector(oldV, FVector(-m_vMax, -m_vMax, 0.0f), FVector(m_vMax, m_vMax, 0.0f));
+    m_v = ClampVector(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
 
     m_pos += m_v;
-    /// Update visuals
-    m_mesh->SetWorldLocation(m_pos);
-    RootComponent->SetWorldLocation(m_pos);
-    //
 }
 
 
 /// Seek a position to steer towards
 FVector Boid::seek() const
 {
-    FVector desiredV = m_target - m_pos;
-    FVector outV = desiredV.GetSafeNormal();
-    if (!FMath::IsNearlyEqual(outV.Size(),100.0f))
+    glm::vec3 desiredV = m_target - m_pos;
+    desiredV = glm::normalize(desiredV);
+
+    if (!FMath::IsNearlyEqual(desiredV.Size(),100.0f))
     {
 
-        outV *= m_vMax;
-        outV -= m_v;
+        desiredV *= m_vMax;
+        desiredV -= m_v;
 
         outV.Z = 0.0f;
         // Draw direction line for debug
 
-        return outV;
+        return desiredV;
     }
     //UE_LOG(LogTemp, Warning, TEXT("boid reached target"));
     return desiredV;
 }
 
-FVector Boid::flee()
+glm::vec3 Boid::flee()
 {
     /// steer away from the seeking position
 
-    FVector desiredV =  m_pos - m_target;
-    FVector outV = desiredV.GetSafeNormal();
+    glm::vec3 desiredV =  m_pos - m_target;
+    glm::vec3 outV = desiredV.GetSafeNormal();
     if (!FMath::IsNearlyEqual(outV.Size(), 100.0f))
     {
 
@@ -119,26 +107,25 @@ FVector Boid::flee()
 
         return outV;
     }
-    //UE_LOG(LogTemp, Warning, TEXT("boid reached target"));
     return -m_v;
 }
 
 
 
-FVector Boid::wander() const
+glm::vec3 Boid::wander() const
 {
 
-    FVector future = m_pos + 10.0f * m_v;
-    FVector randRot = FRotator(0.0f, FMath::RandRange(-180.0f, 180.0f), 0.0f).Vector();
-    FVector randPos = future + 5.0f * randRot;
+    glm::vec3 future = m_pos + 10.0f * m_v;
+    glm::vec3 randRot = FRotator(0.0f, FMath::RandRange(-180.0f, 180.0f), 0.0f).Vector();
+    glm::vec3 randPos = future + 5.0f * randRot;
 
     return randPos;
 }
 
-FVector Boid::getAverageNeighbourPos(const EBoidType &_t)
+glm::vec3 Boid::getAverageNeighbourPos(const EBoidType &_t)
 {
     TArray<int> idx;
-    FVector newP = FVector(0.0f);
+    glm::vec3 newP = FVector(0.0f);
 
     if (_t == EBoidType::PREDATOR)
     {
@@ -159,7 +146,6 @@ FVector Boid::getAverageNeighbourPos(const EBoidType &_t)
             newP += m_neighbours[idx[i]]->m_pos;
         }
         newP /= idx.Num();
-        //UE_LOG(LogTemp, Warning, TEXT("newP : (%f , %f, %f)"), newP.X, newP.Y, newP.Z);
 
         //m_target = newP;
         return newP;

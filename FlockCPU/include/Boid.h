@@ -1,7 +1,7 @@
 #ifndef BOID_H
 #define BOID_H
-
-
+#include "glm/vec3.hpp"
+#include "glm/glm.hpp"
 
 
 
@@ -21,20 +21,20 @@ public:
      void onEnterRange();
     /// @brief steers agent towards a target position
     /// @return steering force
-    //FVector seek() const;
+    glm::vec3 seek() const;
     /// @brief steers agent away from a target position
     /// @return steering force
-    //FVector flee();
+    glm::vec3 flee();
     /// @brief applies force to the agent and updates position
     /// @param [in] _force to use
-    //void resolve(const FVector &_f);
+    void resolve(const glm::vec3 &_f);
     /// @brief steer the agent to simulate wandering/grazing
     /// @return random target position to steer towards
-    //FVector wander()const; /// d
+    glm::vec3 wander()const; /// d
     /// @brief get the average position of the typed agents in the neighbourhood
     /// @param [in] _t type of agent position to look for
     /// @return a target vector to steer the boid towards to approach/leave a neighbourhood
-    //FVector getAverageNeighbourPos(const EBoidType &_t); ///d
+    //glm::vec3 getAverageNeighbourPos(const EBoidType &_t); ///d
 
 private:
     // Called when the game starts or when spawned
@@ -52,7 +52,7 @@ public:
 
     /// @brief setter for target position
     /// @param [in] _pos the position of the particle
-    //void setTarget(const FVector &_pos) { m_target = _pos; }
+    void setTarget(const glm::vec3 &_pos) { m_target = _pos; }
     ///@brief whether this agent is out of bound from the meta agent or the eorld sphere
     bool m_isOutOfBound;
     ///@brief type of this agent
@@ -71,12 +71,12 @@ public:
     ///@brief radius for the neighbourhood
     float m_collisionRad;
     ///@brief position of boid
-    //FVector m_pos;
+    glm::vec3 m_pos;
 
     ///@brief current velocity
-    //FVector m_v;
+    glm::vec3 m_v;
     ///@brief target position to move to/focus on
-    //FVector m_target;
+    glm::vec3 m_target;
 
 
 
