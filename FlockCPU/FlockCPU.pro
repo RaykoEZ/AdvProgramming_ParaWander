@@ -33,4 +33,10 @@ INCLUDEPATH +=./include
 DESTDIR=./
 
 SOURCES += \
-    $$PWD/src/main.cpp
+    $$PWD/src/main.cpp \
+    src/World.cpp \
+    src/Boid.cpp
+
+HEADERS += \
+    include/World.h \
+    include/Boid.h
