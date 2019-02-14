@@ -11,13 +11,12 @@ Boid::Boid()
 // Called when the game starts or when spawned
 void Boid::beginPlay()
 {
-    Super::BeginPlay();
     //m_invMass = 1.0f / m_mass;
     //UE_LOG(LogTemp, Warning, TEXT("m_pos : (%f , %f, %f)"), m_pos.X, m_pos.Y, m_pos.Z);
     //UE_LOG(LogTemp, Warning, TEXT("RootLoc : (%f , %f, %f)"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
 }
 
-
+/*
 /// movement of boid every frame
 void Boid::update(const float &_dt)
 {
@@ -51,109 +50,10 @@ void Boid::onEnterRange()
 }
 
 
-
-
-/// delegate functions
-void Boid::onBeginPresenceOverlap(UPrimitiveComponent * _overlappedComponent, AActor * _otherActor, UPrimitiveComponent * _otherComp, int32 _otherBodyIndex, bool _fromSweep, const FHitResult & _sweepResult)
-{
-    Boid* intruder = Cast<ABoid>(_otherActor);
-    if(intruder!=nullptr)
-    {
-        m_neighbours.Add(intruder);
-
-        //UE_LOG(LogTemp, Warning, TEXT("+1 Intruder Boid: %d boids in"),m_neighbours.Num());
-    }
-}
-
-void Boid::onEndPresenceOverlap(UPrimitiveComponent * _overlappedComponent, AActor * _otherActor, UPrimitiveComponent * _otherComp, int32 _otherBodyIndex)
-{
-    for(int i=0 ; i<m_neighbours.Num(); ++i)
-    {
-        if(m_neighbours[i]==_otherActor)
-        {
-            m_neighbours.RemoveAt(i);
-            //UE_LOG(LogTemp, Warning, TEXT("-1 Intruder Boid: %d boids in"), m_neighbours.Num());
-            return;
-        }
-
-    }
-
-}
-
-
 // Called every frame
 void Boid::tick(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
     update(DeltaTime);
-
-}
-
-
-TArray<int> Boid::searchPrey() const
-{
-    TArray<int> out;
-    for(int i = 0; i < m_neighbours.Num(); ++i)
-    {
-        if (m_neighbours[i]->m_type == EBoidType::PREY)
-        {
-            out.Add(i);
-        }
-    }
-
-    return out;
-}
-
-TArray<int> Boid::searchPredator() const
-{
-    TArray<int> out;
-    for (int i = 0; i < m_neighbours.Num(); ++i)
-    {
-        if (m_neighbours[i]->m_type == EBoidType::PREDATOR)
-        {
-            out.Add(i);
-        }
-    }
-
-    return out;
-}
-
-TArray<ABoid*> Boid::getPredator() const
-{
-    TArray<ABoid*> out;
-    for (int i = 0; i < m_neighbours.Num(); ++i)
-    {
-        if (m_neighbours[i]->m_type == EBoidType::PREDATOR)
-        {
-            out.Add(m_neighbours[i]);
-        }
-    }
-
-    return out;
-}
-TArray<ABoid*> Boid::getPrey() const
-{
-    TArray<ABoid*> out;
-    for (int i = 0; i < m_neighbours.Num(); ++i)
-    {
-        if (m_neighbours[i]->m_type == EBoidType::PREY)
-        {
-            out.Add(m_neighbours[i]);
-        }
-    }
-
-    return out;
-}
-
-void Boid::printDebug(const FColor &_c)const
-{
-    //UE_LOG(LogTemp, Warning, TEXT("Draw"));
-    DrawDebugLine(GetWorld(),
-        m_pos,
-        FVector(m_pos + 120 * m_v),
-        _c,
-        false, 0.1f, 0,
-        120.0f);
 
 }
 
@@ -266,3 +166,4 @@ FVector Boid::getAverageNeighbourPos(const EBoidType &_t)
     }
     return m_target;
 }
+*/

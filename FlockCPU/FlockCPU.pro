@@ -40,3 +40,16 @@ SOURCES += \
 HEADERS += \
     include/World.h \
     include/Boid.h
+
+unix {
+    target.path = /usr/lib
+    INSTALLS += target
+}
+CONFIG += console
+win32:
+{
+    # GLM AT HOME
+    INCLUDEPATH+= $$PWD/../../glm
+}
+
+
