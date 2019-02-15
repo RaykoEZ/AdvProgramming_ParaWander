@@ -2,9 +2,8 @@
 #define WORLD_H
 #include "Boid.h"
 
-class  World
+class World
 {
-
 
 public:
     // Sets default values for this pawn's properties
@@ -22,6 +21,6 @@ public:
 
     ///@brief Radius of the simulation world
     float m_worldRad;
-
+    glm::vec3 m_pos;
 };
 #endif // WORLD_H

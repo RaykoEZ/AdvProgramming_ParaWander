@@ -1,37 +1,42 @@
 #include "Boid.h"
+#include <glm/gtx/rotate_vector.hpp>
 
 
-
-Boid::Boid()
+Boid::Boid(const float &_m,
+           const glm::vec3 &_pos,
+           const glm::vec3 &_v,
+           const float &_vMax,
+           const float &_fMax)
+    :
+    m_mass(_m),
+    m_invMass(1.0f/_m),
+    m_vMaxDef(_vMax),
+    m_fMax(_fMax),
+    m_pos(_pos),
+    m_v(_v)
 {
 
-
+    m_isOutOfBound = false;
+    m_collisionRad = 10.0f;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    m_rng = gen;
 }
 
-// Called when the game starts or when spawned
-void Boid::beginPlay()
+
+// Called every frame
+void Boid::tick(const float &_dt)
 {
-    //m_invMass = 1.0f / m_mass;
-    //UE_LOG(LogTemp, Warning, TEXT("m_pos : (%f , %f, %f)"), m_pos.X, m_pos.Y, m_pos.Z);
-    //UE_LOG(LogTemp, Warning, TEXT("RootLoc : (%f , %f, %f)"), GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z);
-}
-
-
-/// movement of boid every frame
-void Boid::update(const float &_dt)
-{
-
-
     glm::vec3 f = seek();
 
     glm::vec3 accel = f * m_invMass;
     glm::vec3 oldV = m_v + accel;
     m_v = glm::clamp(oldV, glm::vec3(-m_vMax*0.5f), glm::vec3(m_vMax));
     m_pos += m_v * _dt;
-
-
 }
-/*
+
+
+
 void Boid::handleStatus()
 {
 }
@@ -41,12 +46,6 @@ void Boid::onEnterRange()
 }
 
 
-// Called every frame
-void Boid::tick(float DeltaTime)
-{
-    update(DeltaTime);
-
-}
 
 //------------------------------------------------------------------------
 
@@ -55,34 +54,29 @@ void Boid::tick(float DeltaTime)
 /// Steering Behaviors For Autonomous Characters
 /// by Craig W.Reynolds, presented on GDC1999
 
-void Boid::resolve(const FVector &_f)
+void Boid::resolve(const glm::vec3 &_f)
 {
-
-    glm::vec3 desiredV = m_target - m_pos;
-    glm::vec3 outV = desiredV.GetSafeNormal();
+    /// to do: use a prey boid resolve funcyion from repo!!!!!!!!!!
     glm::vec3 accel = _f * m_invMass;
     glm::vec3 oldV = m_v + accel;
 
-    m_v = ClampVector(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
+    m_v = glm::clamp(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
 
     m_pos += m_v;
 }
 
 
 /// Seek a position to steer towards
-FVector Boid::seek() const
+glm::vec3 Boid::seek() const
 {
     glm::vec3 desiredV = m_target - m_pos;
     desiredV = glm::normalize(desiredV);
 
-    if (!FMath::IsNearlyEqual(desiredV.Size(),100.0f))
+    if (glm::length(desiredV)!= 0.0f)
     {
 
         desiredV *= m_vMax;
         desiredV -= m_v;
-
-        outV.Z = 0.0f;
-        // Draw direction line for debug
 
         return desiredV;
     }
@@ -95,34 +89,34 @@ glm::vec3 Boid::flee()
     /// steer away from the seeking position
 
     glm::vec3 desiredV =  m_pos - m_target;
-    glm::vec3 outV = desiredV.GetSafeNormal();
-    if (!FMath::IsNearlyEqual(outV.Size(), 100.0f))
+    desiredV = glm::normalize(desiredV);
+    if (glm::length(desiredV)!= 0.0f)
     {
 
-        outV *= m_vMax;
-        outV -= m_v;
-
-        outV.Z = 0.0f;
+        desiredV *= m_vMax;
+        desiredV -= m_v;
         // Draw direction line for debug
 
-        return outV;
+        return desiredV;
     }
     return -m_v;
 }
 
 
 
-glm::vec3 Boid::wander() const
+glm::vec3 Boid::wander()
 {
-
+    std::uniform_real_distribution<> dis(-180.0, 180.0);
+    /// get a future direction and randomly generate possible future directions
     glm::vec3 future = m_pos + 10.0f * m_v;
-    glm::vec3 randRot = FRotator(0.0f, FMath::RandRange(-180.0f, 180.0f), 0.0f).Vector();
-    glm::vec3 randPos = future + 5.0f * randRot;
+    glm::vec2 futureRot = glm::vec2(future.x,future.y);
+    futureRot =  0.5f * glm::rotate(futureRot,static_cast<float>(dis(m_rng)));
+    glm::vec3 randPos = future + glm::vec3(futureRot,0.0f);
 
     return randPos;
 }
-
-glm::vec3 Boid::getAverageNeighbourPos(const EBoidType &_t)
+/*
+glm::vec3 Boid::getAverageNeighbourPos()
 {
     TArray<int> idx;
     glm::vec3 newP = FVector(0.0f);
