@@ -1,4 +1,5 @@
 #include "Boid.h"
+#include "World.h"
 #include <glm/gtx/rotate_vector.hpp>
 
 
@@ -6,14 +7,16 @@ Boid::Boid(const float &_m,
            const glm::vec3 &_pos,
            const glm::vec3 &_v,
            const float &_vMax,
-           const float &_fMax)
+           const float &_fMax,
+           World *_world)
     :
     m_mass(_m),
     m_invMass(1.0f/_m),
     m_vMaxDef(_vMax),
     m_fMax(_fMax),
     m_pos(_pos),
-    m_v(_v)
+    m_v(_v),
+    m_world(_world)
 {
 
     m_isOutOfBound = false;
@@ -27,24 +30,10 @@ Boid::Boid(const float &_m,
 // Called every frame
 void Boid::tick(const float &_dt)
 {
+    m_target = wander();
     glm::vec3 f = seek();
-
-    glm::vec3 accel = f * m_invMass;
-    glm::vec3 oldV = m_v + accel;
-    m_v = glm::clamp(oldV, glm::vec3(-m_vMax*0.5f), glm::vec3(m_vMax));
-    m_pos += m_v * _dt;
+    resolve(_dt, f);
 }
-
-
-
-void Boid::handleStatus()
-{
-}
-
-void Boid::onEnterRange()
-{
-}
-
 
 
 //------------------------------------------------------------------------
@@ -54,7 +43,7 @@ void Boid::onEnterRange()
 /// Steering Behaviors For Autonomous Characters
 /// by Craig W.Reynolds, presented on GDC1999
 
-void Boid::resolve(const glm::vec3 &_f)
+void Boid::resolve(const float &_dt, const glm::vec3 &_f)
 {
     /// to do: use a prey boid resolve funcyion from repo!!!!!!!!!!
     glm::vec3 accel = _f * m_invMass;
@@ -62,7 +51,8 @@ void Boid::resolve(const glm::vec3 &_f)
 
     m_v = glm::clamp(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
 
-    m_pos += m_v;
+    m_pos += m_v * _dt;
+
 }
 
 
@@ -106,44 +96,38 @@ glm::vec3 Boid::flee()
 
 glm::vec3 Boid::wander()
 {
-    std::uniform_real_distribution<> dis(-180.0, 180.0);
+    std::uniform_real_distribution<float> dis(-180.0f, 180.0f);
     /// get a future direction and randomly generate possible future directions
     glm::vec3 future = m_pos + 10.0f * m_v;
     glm::vec2 futureRot = glm::vec2(future.x,future.y);
-    futureRot =  0.5f * glm::rotate(futureRot,static_cast<float>(dis(m_rng)));
+    futureRot =  0.5f * glm::rotate(futureRot,dis(m_rng));
     glm::vec3 randPos = future + glm::vec3(futureRot,0.0f);
 
     return randPos;
 }
-/*
+
 glm::vec3 Boid::getAverageNeighbourPos()
 {
-    TArray<int> idx;
-    glm::vec3 newP = FVector(0.0f);
-
-    if (_t == EBoidType::PREDATOR)
+    unsigned int numNeighbour = 0;
+    glm::vec3 newP = glm::vec3(0.0f);
+    // find nearby boid index
+    for(unsigned int i = 0; i < m_world->m_boids.size(); ++i )
     {
-        idx = searchPredator();
-
-    }
-    else
-    {
-        idx = searchPrey();
-
-    }
-
-    if (idx.Num() > 0)
-    {
-
-        for (int i = 0; i < idx.Num(); ++i)
+        float dist = glm::distance(m_world->m_boids[i]->m_pos,m_pos);
+        //summing positions for averaging later
+        if(dist <= m_collisionRad)
         {
-            newP += m_neighbours[idx[i]]->m_pos;
+            newP +=  m_world->m_boids[i]->m_pos;
+            ++numNeighbour;
         }
-        newP /= idx.Num();
-
-        //m_target = newP;
+    }
+    // get average position of those neighbouring boids
+    if (numNeighbour > 0)
+    {
+        newP /= numNeighbour;
         return newP;
     }
+    // passthrough if there are no neighbours
     return m_target;
 }
-*/
+

@@ -4,11 +4,13 @@
 #include "glm/glm.hpp"
 #include <random>
 #include <memory>
+
 class World;
+
+
 
 class Boid
 {
-
 public:
     // Sets default values for this boid's properties
     Boid() = delete;
@@ -16,12 +18,10 @@ public:
          const glm::vec3 &_pos,
          const glm::vec3 &_v,
          const float &_vMax,
-         const float &_fMax);
+         const float &_fMax,
+         World *_world);
     ~Boid();
-    /// @brief monitors and modifies the states of this agent
-     void handleStatus();
-    /// @brief function called when an agent enters this neighbourhood
-     void onEnterRange();
+
     /// @brief steers agent towards a target position
     /// @return steering force
     glm::vec3 seek() const;
@@ -30,18 +30,14 @@ public:
     glm::vec3 flee();
     /// @brief applies force to the agent and updates position
     /// @param [in] _force to use
-    void resolve(const glm::vec3 &_f);
+    void resolve(const float &_dt, const glm::vec3 &_f);
     /// @brief steer the agent to simulate wandering/grazing
     /// @return random target position to steer towards
     glm::vec3 wander(); /// d
     /// @brief get the average position of the typed agents in the neighbourhood
     /// @param [in] _t type of agent position to look for
     /// @return a target vector to steer the boid towards to approach/leave a neighbourhood
-    //glm::vec3 getAverageNeighbourPos(); ///d
-
-private:
-    /// @brief pointer ref to its world and properties of world
-    std::shared_ptr<World> m_world;
+    glm::vec3 getAverageNeighbourPos();
 
 public:
     // Called every frame
@@ -71,10 +67,10 @@ public:
     ///@brief target position to move to/focus on
     glm::vec3 m_target;
 
+private:
 
-
-
-
+    /// @brief pointer ref to its world and properties of world
+    World* m_world;
     ///@brief seeded pseudo random number generator for initialisation
     std::mt19937 m_rng;
 };
