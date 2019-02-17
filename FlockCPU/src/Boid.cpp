@@ -1,19 +1,19 @@
 #include "Boid.h"
 #include "World.h"
 #include <glm/gtx/rotate_vector.hpp>
+#include <iostream>
 
 
 Boid::Boid(const float &_m,
            const glm::vec3 &_pos,
            const glm::vec3 &_v,
            const float &_vMax,
-           const float &_fMax,
            World *_world)
     :
     m_mass(_m),
     m_invMass(1.0f/_m),
+    m_vMax(_vMax),
     m_vMaxDef(_vMax),
-    m_fMax(_fMax),
     m_pos(_pos),
     m_v(_v),
     m_world(_world)
@@ -22,7 +22,7 @@ Boid::Boid(const float &_m,
     m_isOutOfBound = false;
     m_collisionRad = 10.0f;
     std::random_device rd;
-    std::mt19937 gen(rd());
+    std::mt19937_64 gen(rd());
     m_rng = gen;
 }
 
@@ -48,9 +48,10 @@ void Boid::resolve(const float &_dt, const glm::vec3 &_f)
     /// to do: use a prey boid resolve funcyion from repo!!!!!!!!!!
     glm::vec3 accel = _f * m_invMass;
     glm::vec3 oldV = m_v + accel;
-
+    //std::cout <<"oldV: " << oldV.x <<','<< oldV.y<<'\n';
+    //std::cout <<"m_v: " << m_v.x <<','<< m_v.y<<'\n';
     m_v = glm::clamp(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
-
+    m_v = glm::normalize(m_v);
     m_pos += m_v * _dt;
 
 }
@@ -64,13 +65,15 @@ glm::vec3 Boid::seek() const
 
     if (glm::length(desiredV)!= 0.0f)
     {
+        //std::cout <<"Seeking "<<'\n';
 
         desiredV *= m_vMax;
         desiredV -= m_v;
 
         return desiredV;
     }
-    //UE_LOG(LogTemp, Warning, TEXT("boid reached target"));
+    //std::cout <<"Reached " <<'\n';
+
     return desiredV;
 }
 
@@ -96,12 +99,20 @@ glm::vec3 Boid::flee()
 
 glm::vec3 Boid::wander()
 {
+
     std::uniform_real_distribution<float> dis(-180.0f, 180.0f);
+
+
     /// get a future direction and randomly generate possible future directions
     glm::vec3 future = m_pos + 10.0f * m_v;
-    glm::vec2 futureRot = glm::vec2(future.x,future.y);
-    futureRot =  0.5f * glm::rotate(futureRot,dis(m_rng));
-    glm::vec3 randPos = future + glm::vec3(futureRot,0.0f);
+
+    glm::vec3 randPos = future + glm::rotate((m_v),glm::radians(dis(m_rng)),glm::vec3(0.0f,0.0f,1.0f));
+    //glm::vec3 randPos = future + glm::vec3(futureRot,0.0f);
+    //std::cout <<"Rand Target: " << randPos.x <<','<< randPos.y<<'\n';
+    //std::cout <<"Rand rot: " << dis(m_rng)<<'\n';
+
+    //std::cout <<"Rand Target: " << glm::rotateX(m_v,dis(m_rng)).x<<','<< glm::rotateX(m_v,dis(m_rng)).y <<'\n';
+    //m_v = glm::normalize(randPos - m_pos);
 
     return randPos;
 }

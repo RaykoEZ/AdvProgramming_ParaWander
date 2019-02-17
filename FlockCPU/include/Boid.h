@@ -18,9 +18,8 @@ public:
          const glm::vec3 &_pos,
          const glm::vec3 &_v,
          const float &_vMax,
-         const float &_fMax,
          World *_world);
-    ~Boid();
+    ~Boid(){}
 
     /// @brief steers agent towards a target position
     /// @return steering force
@@ -56,8 +55,6 @@ public:
     float m_vMax;
     ///@brief max speed gain default
     float m_vMaxDef;
-    ///@brief max force gain
-    float m_fMax;
     ///@brief radius for the neighbourhood
     float m_collisionRad;
     ///@brief position of boid
@@ -72,6 +69,6 @@ private:
     /// @brief pointer ref to its world and properties of world
     World* m_world;
     ///@brief seeded pseudo random number generator for initialisation
-    std::mt19937 m_rng;
+    std::mt19937_64 m_rng;
 };
 #endif // BOID_H

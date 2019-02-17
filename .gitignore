@@ -27,6 +27,11 @@ Makefile
 *.lib
 *.ilk
 
+#Houdini
+*.geo
+geo/
+
+
 # debug
 
 *.pdb

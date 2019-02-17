@@ -16,8 +16,8 @@ isEqual(QT_MAJOR_VERSION, 5) {
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-TEMPLATE = lib
-CONFIG += staticlib
+#TEMPLATE = lib
+#CONFIG += staticlib
 
 
 # You can also make your code fail to compile if you use deprecated APIs.

@@ -10,6 +10,7 @@ struct BoidData
     std::vector<glm::vec3> m_pos;
     /// @brief colour of particle/boid to export
     std::vector<glm::vec3> m_col;
+    BoidData(){}
     /// @brief ctor for output data
     BoidData(const std::vector<glm::vec3> &_pos,
              const std::vector<glm::vec3> &_col) : m_pos(_pos), m_col(_col){}
@@ -25,7 +26,7 @@ public:
           const float &_worldRad,
           const glm::vec3 &_spawnPos);
 
-    ~World();
+    ~World(){}
 
 public:
     // Called every frame
