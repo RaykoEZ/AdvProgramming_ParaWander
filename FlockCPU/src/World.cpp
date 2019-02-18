@@ -26,7 +26,7 @@ World::World(const unsigned int &_nBoids,
         /// Spawning a boid
         /// Get a boid initialized
         //auto boid = std::make_unique<Boid>(10.0f,pos,v,1.0f,1.0f,*this);
-        m_boids.push_back(std::make_unique<Boid>(10.0f,pos,v,vMaxDis(gen),this));
+        m_boids.push_back(std::make_shared<Boid>(10.0f,pos,v,vMaxDis(gen),this));
         m_boids[i]->setTarget(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 }
