@@ -37,6 +37,6 @@ public:
     /// @brief Position to spawn voids
     glm::vec3 m_spawnPos;
     /// @brief container of all boids in the flock
-    std::vector<std::unique_ptr<Boid>> m_boids;
+    std::vector<Boid> m_boids;
 };
 #endif // WORLD_H

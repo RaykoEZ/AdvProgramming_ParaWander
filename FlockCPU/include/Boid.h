@@ -13,10 +13,10 @@ class Boid
 {
 public:
     // Sets default values for this boid's properties
-    Boid() = delete;
-    //Boid(const Boid&){}
+    Boid() = default;
+    //Boid(const Boid&) = default;
     //Boid& operator=(const Boid&){return *this;}
-    Boid(Boid&&) = default;
+    //Boid(Boid&&) = default;
     Boid(const float &_m,
          const glm::vec3 &_pos,
          const glm::vec3 &_v,

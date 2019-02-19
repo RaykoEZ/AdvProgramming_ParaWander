@@ -124,11 +124,11 @@ glm::vec3 Boid::getAverageNeighbourPos()
     // find nearby boid index
     for(unsigned int i = 0; i < m_world->m_boids.size(); ++i )
     {
-        float dist = glm::distance(m_world->m_boids[i]->m_pos,m_pos);
+        float dist = glm::distance(m_world->m_boids[i].m_pos,m_pos);
         //summing positions for averaging later
         if(dist <= m_collisionRad)
         {
-            newP +=  m_world->m_boids[i]->m_pos;
+            newP +=  m_world->m_boids[i].m_pos;
             ++numNeighbour;
         }
     }
