@@ -4,12 +4,14 @@
 #include <iostream>
 
 
-Boid::Boid(const float &_m,
+Boid::Boid(const unsigned int &_id,
+           const float &_m,
            const glm::vec3 &_pos,
            const glm::vec3 &_v,
            const float &_vMax,
            World *_world)
     :
+    m_id(_id),
     m_mass(_m),
     m_invMass(1.0f/_m),
     m_vMax(_vMax),
@@ -19,8 +21,9 @@ Boid::Boid(const float &_m,
     m_world(_world)
 {
 
-    m_isOutOfBound = false;
+    m_collision = false;
     m_collisionRad = 10.0f;
+    m_col = glm::vec3(255.0f);
     std::random_device rd;
     std::mt19937_64 gen(rd());
     m_rng = gen;
@@ -30,8 +33,24 @@ Boid::Boid(const float &_m,
 // Called every frame
 void Boid::tick(const float &_dt)
 {
-    m_target = wander();
-    glm::vec3 f = seek();
+    glm::vec3 collisionTarget = getAverageNeighbourPos();
+    /// above function returns old m_target if no collision
+    glm::vec3 f;
+    if(m_collision)
+    {
+        m_target = collisionTarget;
+        f = flee();
+        m_col = glm::vec3(255.0f,0.0f,0.0f);
+
+    }
+    else
+    {
+        m_target = wander();
+        f = seek();
+        m_col = glm::vec3(0.0f,255.0f,0.0f);
+
+    }
+    m_collision = false;
     resolve(_dt, f);
 }
 
@@ -126,7 +145,7 @@ glm::vec3 Boid::getAverageNeighbourPos()
     {
         float dist = glm::distance(m_world->m_boids[i].m_pos,m_pos);
         //summing positions for averaging later
-        if(dist <= m_collisionRad)
+        if(dist <= m_collisionRad && m_world->m_boids[i].m_id != m_id)
         {
             newP +=  m_world->m_boids[i].m_pos;
             ++numNeighbour;
@@ -135,6 +154,7 @@ glm::vec3 Boid::getAverageNeighbourPos()
     // get average position of those neighbouring boids
     if (numNeighbour > 0)
     {
+        m_collision = true;
         newP /= numNeighbour;
         return newP;
     }

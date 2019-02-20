@@ -63,7 +63,7 @@ void dumpToGeo(const std::vector<glm::vec3> &points,
 int main()
 {
     // make our world
-    World world = World(100,300.0f,glm::vec3(0.0f));
+    World world = World(300,200.0f,glm::vec3(0.0f));
     unsigned int nframes = 1000;
     float dt = 0.5f;
     BoidData data;

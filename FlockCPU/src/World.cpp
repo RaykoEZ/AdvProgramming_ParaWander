@@ -26,7 +26,7 @@ World::World(const unsigned int &_nBoids,
         /// Spawning a boid
         /// Get a boid initialized
         //auto boid = std::make_unique<Boid>(10.0f,pos,v,1.0f,1.0f,*this);
-        m_boids.emplace_back(Boid(10.0f,pos,v,vMaxDis(gen),this));
+        m_boids.emplace_back(Boid(i,10.0f,pos,v,vMaxDis(gen),this));
         m_boids[i].setTarget(glm::vec3(0.0f, 0.0f, 0.0f));
     }
 }
@@ -44,7 +44,7 @@ BoidData World::tick(const float &_dt)
     {
         m_boids[i].tick(_dt);
         pos.emplace_back(m_boids[i].m_pos);
-        col.push_back(glm::vec3(0.0f,255.0f,0.0f));
+        col.push_back(m_boids[i].m_col);
     }
     return BoidData(pos,col);
 }

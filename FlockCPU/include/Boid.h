@@ -17,7 +17,8 @@ public:
     //Boid(const Boid&) = default;
     //Boid& operator=(const Boid&){return *this;}
     //Boid(Boid&&) = default;
-    Boid(const float &_m,
+    Boid(const unsigned int &_id,
+         const float &_m,
          const glm::vec3 &_pos,
          const glm::vec3 &_v,
          const float &_vMax,
@@ -49,7 +50,9 @@ public:
     /// @param [in] _pos the position of the particle
     void setTarget(const glm::vec3 &_pos) { m_target = _pos; }
     ///@brief whether this agent is out of bound from the meta agent or the eorld sphere
-    bool m_isOutOfBound;
+    bool m_collision;
+    /// @brief id of this boid
+    unsigned int m_id;
     ///@brief set mesh for a boid
     float m_mass;
     ///@brief for a = f/m, 1/m pre-calculated
@@ -67,6 +70,8 @@ public:
     ///@brief target position to move to/focus on
     glm::vec3 m_target;
 
+    ///@brief colour
+    glm::vec3 m_col;
 private:
 
     /// @brief pointer ref to its world and properties of world
