@@ -31,7 +31,6 @@ public:
 public:
     // Called every frame
     BoidData tick(const float &_dt);
-
     /// @brief Radius of the simulation world
     float m_worldRad;
     /// @brief Position to spawn voids
