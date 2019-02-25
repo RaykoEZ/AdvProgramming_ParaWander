@@ -27,6 +27,6 @@ isEqual(QT_MAJOR_VERSION, 5) {
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG-=app_bundle
-
+LIBS+= -lgtest
 # where our exe is going to live (root of project)
 DESTDIR=./
