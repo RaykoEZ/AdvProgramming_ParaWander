@@ -6,9 +6,9 @@
 
 Boid::Boid(const unsigned int &_id,
            const float &_m,
+           const float &_vMax,
            const glm::vec3 &_pos,
            const glm::vec3 &_v,
-           const float &_vMax,
            World *_world)
     :
     m_id(_id),
@@ -16,9 +16,10 @@ Boid::Boid(const unsigned int &_id,
     m_invMass(1.0f/_m),
     m_vMax(_vMax),
     m_vMaxDef(_vMax),
+    m_world(_world),
     m_pos(_pos),
-    m_v(_v),
-    m_world(_world)
+    m_v(_v)
+
 {
 
     m_collision = false;
@@ -96,7 +97,7 @@ glm::vec3 Boid::seek() const
     return desiredV;
 }
 
-glm::vec3 Boid::flee()
+glm::vec3 Boid::flee() const
 {
     /// steer away from the seeking position
 
