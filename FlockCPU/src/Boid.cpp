@@ -6,9 +6,9 @@
 
 Boid::Boid(const unsigned int &_id,
            const float &_m,
-           const float &_vMax,
            const glm::vec3 &_pos,
            const glm::vec3 &_v,
+           const float &_vMax,
            World *_world)
     :
     m_id(_id),

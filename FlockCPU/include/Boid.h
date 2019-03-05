@@ -64,7 +64,7 @@ private:
     glm::vec3 seek() const;
     /// @brief steers agent away from a target position
     /// @return steering force
-    glm::vec3 flee();
+    glm::vec3 flee() const;
     /// @brief applies force to the agent and updates position
     /// @param [in] _force to use
     void resolve(const float &_dt, const glm::vec3 &_f);
