@@ -16,7 +16,7 @@ public:
     void setup(const unsigned int &_numP, const unsigned int &_res);
 protected:
     /// Keep track of whether the simulation is ready to start
-    bool m_isInit;
+    bool m_finishedInit;
 
     void init(const unsigned int &_numP, const unsigned int &_res);
 

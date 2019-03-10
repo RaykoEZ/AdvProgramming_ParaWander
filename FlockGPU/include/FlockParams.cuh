@@ -22,7 +22,6 @@ public:
     FlockParams(
     const unsigned int &_numP,
     const float &_m,
-    const float &_invM,
     const float &_vMax,
     const float &_dt);
 
@@ -30,28 +29,28 @@ public:
 
     void init();
 
-    unsigned int getNumParticles(){ return m_data.m_numParticles;}
+    unsigned int getNumParticles() const { return m_data.m_numParticles;}
 
-    float getMass(){ return m_data.m_mass;}
+    float getMass() const { return m_data.m_mass;}
 
-    float getInverseMass(){ return m_data.m_invMass;}
+    float getInverseMass() const { return m_data.m_invMass;}
 
-    float getVMax(){ return m_data.m_vMax;}
+    float getVMax() const { return m_data.m_vMax;}
 
-    float getTimeStep(){ return m_data.m_dt;}
-
-
+    float getTimeStep() const { return m_data.m_dt;}
 
 
-    void setNumParticles(const unsigned int &_numP){ m_data.m_numParticles=_numP;}
 
-    void setMass(const float &_m){ m_data.m_mass=_m; }
 
-    void setInverseMass(const float &_invM){ m_data.m_invMass=_invM; }
+    void setNumParticles(const unsigned int &_numP);
 
-    void setVMax(const float &_vMax){ m_data.m_vMax=_vMax; }
+    void setMass(const float &_m);
 
-    void setTimeStep(const float &_dt) {m_data.m_dt=_dt; }
+    void setInverseMass(const float &_m);
+
+    void setVMax(const float &_vMax);
+
+    void setTimeStep(const float &_dt);
 
 protected:
 
