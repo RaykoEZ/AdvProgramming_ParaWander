@@ -34,14 +34,14 @@ DESTDIR=./
 
 SOURCES += \
     $$PWD/src/*.cpp \
-    src/FlockParams.cpp
+    src/*.cu \
 
 
 HEADERS += \
     $$PWD/include/*.cuh \
     $$PWD/include/*.h \
-    include/FlockDefines.h \
-    include/FlockParams.h
+
+
 
 
 

@@ -1,5 +1,5 @@
-#ifndef FLOCKSYSTEM_H
-#define FLOCKSYSTEM_H
+#ifndef FLOCKSYSTEM_CUH
+#define FLOCKSYSTEM_CUH
 #include "FlockDefines.h"
 #include <vector>
 
@@ -22,4 +22,4 @@ protected:
 
     void clear();
 };
-#endif //FLOCKSYSTEM_H
+#endif //FLOCKSYSTEM_CUH
