@@ -3,11 +3,16 @@
 #include "FlockDefines.h"
 #include <vector>
 
+class FlockParams;
+
 class FlockSystem {
 
 public:
-    /// Construct an empty fluid system
-    FlockSystem();
+    /// Constructor
+    FlockSystem(const unsigned int &_numP,
+                const float &_m,
+                const float &_vMax,
+                const float &_dt);
 
     /// Destruct our fluid system
     ~FlockSystem();
@@ -20,6 +25,10 @@ protected:
 
     void init(const unsigned int &_numP, const unsigned int &_res);
 
+    void tick(const float &_dt = DEFAULT_TIMESTEP);
     void clear();
+private:
+    FlockParams m_params;
+
 };
 #endif //FLOCKSYSTEM_CUH

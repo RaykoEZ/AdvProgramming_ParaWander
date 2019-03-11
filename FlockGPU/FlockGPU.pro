@@ -41,11 +41,6 @@ HEADERS += \
     $$PWD/include/*.cuh \
     $$PWD/include/*.h \
 
-
-
-
-
-
 # cuda project setuo from Richard Southern's libfluid:
 #https://github.com/NCCA/libfluid/tree/master/libfluid
 
@@ -94,8 +89,8 @@ NVCC_DEBUG_FLAGS =
 # NVCC_DEBUG_FLAGS += -D_DEBUG -g -G  -DTHRUST_DEBUG
 # NVCC_DEBUG_FLAGS += -Xptxas -v
 # # New added by Jon - determines the best current cuda architecture of your system
-GENCODE=$$system(../findCudaArch.sh)
-NVCCFLAGS =  -ccbin $$(HOST_COMPILER) -I../src/	-m64 $$NVCC_DEBUG_FLAGS $$GENCODE --compiler-options -fno-strict-aliasing --compiler-options -fPIC -use_fast_math --std=c++11
+# GENCODE=$$system(../findCudaArch.sh)
+NVCCFLAGS =  -ccbin $$(HOST_COMPILER) -I../src/	-m64 $$NVCC_DEBUG_FLAGS --compiler-options -fno-strict-aliasing --compiler-options -fPIC -use_fast_math --std=c++11
 message($$NVCCFLAGS)
 # # Define the path and binary for nvcc
 NVCCBIN = $$CUDA_DIR/bin/nvcc
