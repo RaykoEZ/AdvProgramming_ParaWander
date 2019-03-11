@@ -25,8 +25,27 @@ isEqual(QT_MAJOR_VERSION, 5) {
 # any feature of Qt which has been marked as deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
+unix:{
+   LIBS+= -lgtest
+}
 DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG-=app_bundle
-LIBS+= -lgtest
+
+LIBS+= -L"../FlockCPU" -lFlockCPU
 # where our exe is going to live (root of project)
 DESTDIR=./
+win32:{
+
+    # GLM AT HOME
+    INCLUDEPATH+= $$PWD/../../../glm
+
+    # Gtest dependencies at Home, according to https://doc.qt.io/qtcreator/creator-autotest.html#setting-up-the-google-c-testing-framework
+    GTEST_DIR = ../../googletest
+    INCLUDEPATH+= $$GTEST_DIR/googletest \
+                  $$GTEST_DIR/googletest/include \
+                  $$GTEST_DIR/googlemock \
+                  $$GTEST_DIR/googlemock/include
+    # sources needed for gtest
+    SOURCES += $$GTEST_DIR/googletest/src/gtest-all.cc \
+               $$GTEST_DIR/googlemock/src/gmock-all.cc
+}

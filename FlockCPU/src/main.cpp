@@ -3,6 +3,20 @@
 #include <fstream>
 #include <sstream>
 #include "World.h"
+//#include <gtest/gtest.h>
+
+int one(){return 1;}
+/*
+namespace
+{
+    TEST(one,Trivial)
+    {
+      // This test is named "Negative", and belongs to the "FactorialTest"
+      // test case.
+      EXPECT_EQ(1, one());
+    }
+}
+*/
 /// Dump our data from the fluid problem to a file
 /// Taken from: https://github.com/NCCA/libfluid/blob/master/test/src/main.cpp
 /// By Richard Southern
@@ -75,5 +89,6 @@ int main()
         dumpToGeo(data.m_pos,data.m_col,i);
     }
 
+    //RUN_ALL_TESTS();
     return EXIT_SUCCESS;
 }
