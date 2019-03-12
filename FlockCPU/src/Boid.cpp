@@ -25,6 +25,7 @@ Boid::Boid(const unsigned int &_id,
     m_collision = false;
     m_collisionRad = 10.0f;
     m_col = glm::vec3(255.0f);
+    m_target = glm::vec3(0.0f);
     std::random_device rd;
     std::mt19937_64 gen(rd());
     m_rng = gen;

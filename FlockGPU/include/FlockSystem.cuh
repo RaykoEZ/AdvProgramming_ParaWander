@@ -28,7 +28,7 @@ protected:
     void tick(const float &_dt = DEFAULT_TIMESTEP);
     void clear();
 private:
-    FlockParams m_params;
+    FlockParams* m_params;
 
 };
 #endif //FLOCKSYSTEM_CUH

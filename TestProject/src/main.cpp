@@ -3,20 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include "World.h"
-#include "gtest/gtest.h"
-
-int one(){ return 1;}
-
-namespace
-{
-    TEST(one,Trivial)
-    {
-      // This test is named "Negative", and belongs to the "FactorialTest"
-      // test case.
-      EXPECT_EQ(1, one());
-    }
-}
-
+#include "UnitTests.h"
 
 /// Dump our data from the fluid problem to a file
 /// Taken from: https://github.com/NCCA/libfluid/blob/master/test/src/main.cpp
@@ -74,11 +61,11 @@ void dumpToGeo(const std::vector<glm::vec3> &points,
     file<<ss.rdbuf();
     file.close();
 }
-int main()
+int main(int argc, char** argv)
 {
     /// Test run
-    testing::InitGoogleTest();
-    RUN_ALL_TESTS();
+    testing::InitGoogleTest(&argc, argv);
+
     /// CPU VERSION of Flocking Sim
     ///
     // make our world
@@ -93,5 +80,7 @@ int main()
         //std::cout << "pos ="<<data.m_pos[0].x<<','<<data.m_pos[0].y << '\n';
         dumpToGeo(data.m_pos,data.m_col,i);
     }*/
-    return 0;
+
+
+    return RUN_ALL_TESTS();;
 }

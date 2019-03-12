@@ -12,9 +12,7 @@ class Boid
 public:
     // Sets default values for this boid's properties
     Boid() = default;
-    //Boid(const Boid&) = default;
-    //Boid& operator=(const Boid&){return *this;}
-    //Boid(Boid&&) = default;
+
     Boid(const unsigned int &_id,
          const float &_m,
          const glm::vec3 &_pos,
@@ -35,6 +33,28 @@ public:
     /// @brief setter for target position
     /// @param [in] _pos the position of the particle
     void setTarget(const glm::vec3 &_pos) { m_target = _pos;}
+
+    /// @brief setter for collision detection radius
+    /// @param [in] _r radius
+    void setCollisionRadius(const float &_r) { m_collisionRad = _r;}
+    /// @brief setter for vMax Default
+    /// @param [in] _v default value
+    void setDefaultVMax(const float &_v) { m_vMaxDef = _v;}
+    /// @brief setter for mass
+    /// @param [in] _m mass
+    void setMass(const float &_m) { m_mass = _m; m_invMass = 1.0f/_m;}
+
+
+    /// @brief getters
+    bool getCollision() const {return m_collision;}
+    unsigned int getId() const {return m_id;}
+    float getMass() const {return m_mass;}
+    float getVMax() const {return m_vMax;}
+    float getVMaxDefault() const {return m_vMaxDef;}
+    float getCollisionRadius() const {return m_collisionRad;}
+    World* getWorld() const {return m_world;}
+    glm::vec3 getV() const {return m_v;}
+    glm::vec3 getTarget() const {return m_target;}
 
 private:
     ///@brief whether this agent is out of bound from the meta agent or the eorld sphere

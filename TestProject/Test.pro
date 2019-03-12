@@ -26,7 +26,7 @@ isEqual(QT_MAJOR_VERSION, 5) {
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 unix:{
-   LIBS+= -lgtest
+   LIBS+= -lgtest -lbenchmark
 }
 DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG-=app_bundle
@@ -49,3 +49,7 @@ win32:{
     SOURCES += $$GTEST_DIR/googletest/src/gtest-all.cc \
                $$GTEST_DIR/googlemock/src/gmock-all.cc
 }
+
+HEADERS += \
+    src/UnitTests.h \
+
