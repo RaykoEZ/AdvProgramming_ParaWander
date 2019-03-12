@@ -35,6 +35,7 @@ Boid::Boid(const unsigned int &_id,
 // Called every frame
 void Boid::tick(const float &_dt)
 {
+    if(m_mass <= 0.0f) return;
     glm::vec3 collisionTarget = getAverageNeighbourPos();
     /// above function returns old m_target if no collision
     glm::vec3 f;
@@ -52,7 +53,7 @@ void Boid::tick(const float &_dt)
         m_col = glm::vec3(0.0f,255.0f,0.0f);
 
     }
-    m_collision = false;
+
     resolve(_dt, f);
 }
 
@@ -71,8 +72,16 @@ void Boid::resolve(const float &_dt, const glm::vec3 &_f)
     glm::vec3 oldV = m_v + accel;
     //std::cout <<"oldV: " << oldV.x <<','<< oldV.y<<'\n';
     //std::cout <<"m_v: " << m_v.x <<','<< m_v.y<<'\n';
-    m_v = glm::clamp(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
-    m_v = glm::normalize(m_v);
+
+    if(glm::length(m_v) > 0.0f)
+    {
+        m_v = glm::clamp(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
+        m_v = glm::normalize(m_v);
+    }
+
+
+    //std::cout <<"m_v: " << m_v.x <<','<< m_v.y<<'\n';
+
     m_pos += m_v * _dt;
 
 }
@@ -82,12 +91,11 @@ void Boid::resolve(const float &_dt, const glm::vec3 &_f)
 glm::vec3 Boid::seek() const
 {
     glm::vec3 desiredV = m_target - m_pos;
-    desiredV = glm::normalize(desiredV);
 
-    if (glm::length(desiredV)!= 0.0f)
+    if (glm::length(desiredV) > 0.0f)
     {
         //std::cout <<"Seeking "<<'\n';
-
+        desiredV = glm::normalize(desiredV);
         desiredV *= m_vMax;
         desiredV -= m_v;
 
@@ -103,10 +111,9 @@ glm::vec3 Boid::flee() const
     /// steer away from the seeking position
 
     glm::vec3 desiredV =  m_pos - m_target;
-    desiredV = glm::normalize(desiredV);
-    if (glm::length(desiredV)!= 0.0f)
+    if (glm::length(desiredV)> 0.0f)
     {
-
+        desiredV = glm::normalize(desiredV);
         desiredV *= m_vMax;
         desiredV -= m_v;
         // Draw direction line for debug
@@ -128,12 +135,7 @@ glm::vec3 Boid::wander()
     glm::vec3 future = m_pos + 10.0f * m_v;
 
     glm::vec3 randPos = future + glm::rotate((m_v),glm::radians(dis(m_rng)),glm::vec3(0.0f,0.0f,1.0f));
-    //glm::vec3 randPos = future + glm::vec3(futureRot,0.0f);
-    //std::cout <<"Rand Target: " << randPos.x <<','<< randPos.y<<'\n';
-    //std::cout <<"Rand rot: " << dis(m_rng)<<'\n';
 
-    //std::cout <<"Rand Target: " << glm::rotateX(m_v,dis(m_rng)).x<<','<< glm::rotateX(m_v,dis(m_rng)).y <<'\n';
-    //m_v = glm::normalize(randPos - m_pos);
 
     return randPos;
 }
@@ -145,7 +147,9 @@ glm::vec3 Boid::getAverageNeighbourPos()
     // find nearby boid index
     for(unsigned int i = 0; i < m_world->m_boids.size(); ++i )
     {
+
         float dist = glm::distance(m_world->m_boids[i].m_pos,m_pos);
+        //std::cout<< m_world->m_boids[i].m_v.x<<m_world->m_boids[i].m_v.y << " " << m_id<< " on "<< i <<'\n';
         //summing positions for averaging later
         if(dist <= m_collisionRad && m_world->m_boids[i].m_id != m_id)
         {
@@ -160,6 +164,11 @@ glm::vec3 Boid::getAverageNeighbourPos()
         newP /= numNeighbour;
         return newP;
     }
+    else
+    {
+        m_collision = false;
+    }
+
     // passthrough if there are no neighbours
     return m_target;
 }

@@ -69,7 +69,8 @@ int main(int argc, char** argv)
     /// CPU VERSION of Flocking Sim
     ///
     // make our world
-    /*World world = World(300,200.0f,glm::vec3(0.0f));
+    /*
+    World world = World(300,200.0f,glm::vec3(0.0f));
     unsigned int nframes = 1000;
     float dt = 0.5f;
     BoidData data;
@@ -79,8 +80,8 @@ int main(int argc, char** argv)
         data = world.tick(dt);
         //std::cout << "pos ="<<data.m_pos[0].x<<','<<data.m_pos[0].y << '\n';
         dumpToGeo(data.m_pos,data.m_col,i);
-    }*/
-
+    }
+    */
 
     return RUN_ALL_TESTS();;
 }
