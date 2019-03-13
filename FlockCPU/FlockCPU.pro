@@ -35,11 +35,13 @@ DESTDIR=./
 
 SOURCES += \
     src/World.cpp \
-    src/Boid.cpp
+    src/Boid.cpp \
+    src/FlockActions.cpp \
 
 HEADERS += \
     include/World.h \
-    include/Boid.h
+    include/Boid.h \
+    include/FlockActions.h \
 
 unix {
     target.path = /usr/lib

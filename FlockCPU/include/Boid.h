@@ -1,9 +1,6 @@
 #ifndef BOID_H
 #define BOID_H
-#include "glm/vec3.hpp"
-#include "glm/glm.hpp"
-#include <random>
-#include <memory>
+#include "FlockActions.h"
 
 class World;
 
@@ -21,6 +18,24 @@ public:
          World *_world);
     ~Boid(){}
 
+    /// @brief data to be passed from the neighbourhood checks,
+    /// used for collision detection and flee behaviours
+    struct NeighbourInfo
+    {
+        ///@brief average position of neighbourhood
+        glm::vec3 m_averagePos;
+        ///@brief number of neighbours in neighbourhood
+        unsigned int m_numNeighbour;
+
+        bool m_isThereCollision;
+
+        NeighbourInfo(const glm::vec3 &_p,
+                      const unsigned int &_num,
+                      const bool &_col)
+            : m_averagePos(_p), m_numNeighbour(_num), m_isThereCollision(_col)
+        {}
+    };
+
 
 public:
 
@@ -37,6 +52,10 @@ public:
     /// @brief setter for collision detection radius
     /// @param [in] _r radius
     void setCollisionRadius(const float &_r) { m_collisionRad = _r;}
+
+    /// @brief setter for collision detection flag
+    /// @param [in] _c whether there is collision or not
+    void setCollision(const bool &_c) { m_collision = _c;}
     /// @brief setter for vMax Default
     /// @param [in] _v default value
     void setDefaultVMax(const float &_v) { m_vMaxDef = _v;}
@@ -55,7 +74,10 @@ public:
     World* getWorld() const {return m_world;}
     glm::vec3 getV() const {return m_v;}
     glm::vec3 getTarget() const {return m_target;}
-
+    /// @brief get the average position of the typed agents in the neighbourhood
+    /// @param [in] _t type of agent position to look for
+    /// @return a target vector to steer the boid towards to approach/leave a neighbourhood
+    NeighbourInfo getAverageNeighbourPos() const;
 private:
     ///@brief whether this agent is out of bound from the meta agent or the eorld sphere
     bool m_collision;
@@ -73,27 +95,11 @@ private:
     float m_collisionRad;
     /// @brief pointer ref to its world and properties of world
     World* m_world;
-    ///@brief seeded pseudo random number generator for initialisation
-    std::mt19937_64 m_rng;
     ///@brief current velocity
     glm::vec3 m_v;
     ///@brief target position to move to/focus on
     glm::vec3 m_target;
-    /// @brief steers agent towards a target position
-    /// @return steering force
-    glm::vec3 seek() const;
-    /// @brief steers agent away from a target position
-    /// @return steering force
-    glm::vec3 flee() const;
-    /// @brief applies force to the agent and updates position
-    /// @param [in] _force to use
-    void resolve(const float &_dt, const glm::vec3 &_f);
-    /// @brief steer the agent to simulate wandering/grazing
-    /// @return random target position to steer towards
-    glm::vec3 wander(); /// d
-    /// @brief get the average position of the typed agents in the neighbourhood
-    /// @param [in] _t type of agent position to look for
-    /// @return a target vector to steer the boid towards to approach/leave a neighbourhood
-    glm::vec3 getAverageNeighbourPos();
+
+
 };
 #endif // BOID_H

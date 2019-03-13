@@ -26,35 +26,50 @@ Boid::Boid(const unsigned int &_id,
     m_collisionRad = 10.0f;
     m_col = glm::vec3(255.0f);
     m_target = glm::vec3(0.0f);
-    std::random_device rd;
-    std::mt19937_64 gen(rd());
-    m_rng = gen;
+
 }
 
 
 // Called every frame
 void Boid::tick(const float &_dt)
 {
+    /// 0 mass 0 work
     if(m_mass <= 0.0f) return;
-    glm::vec3 collisionTarget = getAverageNeighbourPos();
-    /// above function returns old m_target if no collision
+
+    /// checking for neighbourhood and collision
+    NeighbourInfo collisionTarget = getAverageNeighbourPos();
+    setCollision(collisionTarget.m_isThereCollision);
+    /// collision afftects behaviour or forces applied
     glm::vec3 f;
     if(m_collision)
     {
-        m_target = collisionTarget;
-        f = flee();
+        m_target = collisionTarget.m_averagePos;
+        f = FlockFunctions::flee(m_pos,m_v,m_vMax,m_target);
         m_col = glm::vec3(255.0f,0.0f,0.0f);
 
     }
     else
     {
-        m_target = wander();
-        f = seek();
+        m_target = FlockFunctions::wander(m_pos,m_v);
+        f = FlockFunctions::seek(m_pos,m_v,m_vMax,m_target);
         m_col = glm::vec3(0.0f,255.0f,0.0f);
 
     }
 
-    resolve(_dt, f);
+    // we resolve our forces here
+    glm::vec3 accel = f * m_invMass;
+    glm::vec3 oldV = m_v + accel;
+    //std::cout <<"oldV: " << oldV.x <<','<< oldV.y<<'\n';
+    //std::cout <<"m_v: " << m_v.x <<','<< m_v.y<<'\n';
+    // if direction/velocity vector is 0, we don't normalize into nans
+    if(glm::length(m_v) > 0.0f)
+    {
+        m_v = glm::clamp(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
+        m_v = glm::normalize(m_v);
+    }
+    // update boid position
+    m_pos += m_v * _dt;
+
 }
 
 
@@ -65,82 +80,7 @@ void Boid::tick(const float &_dt)
 /// Steering Behaviors For Autonomous Characters
 /// by Craig W.Reynolds, presented on GDC1999
 
-void Boid::resolve(const float &_dt, const glm::vec3 &_f)
-{
-    /// to do: use a prey boid resolve funcyion from repo!!!!!!!!!!
-    glm::vec3 accel = _f * m_invMass;
-    glm::vec3 oldV = m_v + accel;
-    //std::cout <<"oldV: " << oldV.x <<','<< oldV.y<<'\n';
-    //std::cout <<"m_v: " << m_v.x <<','<< m_v.y<<'\n';
-
-    if(glm::length(m_v) > 0.0f)
-    {
-        m_v = glm::clamp(oldV, glm::vec3(-m_vMax, -m_vMax, 0.0f), glm::vec3(m_vMax, m_vMax, 0.0f));
-        m_v = glm::normalize(m_v);
-    }
-
-
-    //std::cout <<"m_v: " << m_v.x <<','<< m_v.y<<'\n';
-
-    m_pos += m_v * _dt;
-
-}
-
-
-/// Seek a position to steer towards
-glm::vec3 Boid::seek() const
-{
-    glm::vec3 desiredV = m_target - m_pos;
-
-    if (glm::length(desiredV) > 0.0f)
-    {
-        //std::cout <<"Seeking "<<'\n';
-        desiredV = glm::normalize(desiredV);
-        desiredV *= m_vMax;
-        desiredV -= m_v;
-
-        return desiredV;
-    }
-    //std::cout <<"Reached " <<'\n';
-
-    return desiredV;
-}
-
-glm::vec3 Boid::flee() const
-{
-    /// steer away from the seeking position
-
-    glm::vec3 desiredV =  m_pos - m_target;
-    if (glm::length(desiredV)> 0.0f)
-    {
-        desiredV = glm::normalize(desiredV);
-        desiredV *= m_vMax;
-        desiredV -= m_v;
-        // Draw direction line for debug
-
-        return desiredV;
-    }
-    return -m_v;
-}
-
-
-
-glm::vec3 Boid::wander()
-{
-
-    std::uniform_real_distribution<float> dis(-180.0f, 180.0f);
-
-
-    /// get a future direction and randomly generate possible future directions
-    glm::vec3 future = m_pos + 10.0f * m_v;
-
-    glm::vec3 randPos = future + glm::rotate((m_v),glm::radians(dis(m_rng)),glm::vec3(0.0f,0.0f,1.0f));
-
-
-    return randPos;
-}
-
-glm::vec3 Boid::getAverageNeighbourPos()
+Boid::NeighbourInfo Boid::getAverageNeighbourPos() const
 {
     unsigned int numNeighbour = 0;
     glm::vec3 newP = glm::vec3(0.0f);
@@ -160,16 +100,16 @@ glm::vec3 Boid::getAverageNeighbourPos()
     // get average position of those neighbouring boids
     if (numNeighbour > 0)
     {
-        m_collision = true;
         newP /= numNeighbour;
-        return newP;
+        return NeighbourInfo(newP, numNeighbour, true);
     }
     else
     {
-        m_collision = false;
+        return NeighbourInfo(m_target, 0, false);
     }
 
-    // passthrough if there are no neighbours
-    return m_target;
 }
+
+
+
 

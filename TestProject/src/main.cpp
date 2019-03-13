@@ -63,8 +63,7 @@ void dumpToGeo(const std::vector<glm::vec3> &points,
 }
 int main(int argc, char** argv)
 {
-    /// Test run
-    testing::InitGoogleTest(&argc, argv);
+
 
     /// CPU VERSION of Flocking Sim
     ///
@@ -81,7 +80,10 @@ int main(int argc, char** argv)
         //std::cout << "pos ="<<data.m_pos[0].x<<','<<data.m_pos[0].y << '\n';
         dumpToGeo(data.m_pos,data.m_col,i);
     }
+
     */
 
+    /// Test run
+    testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();;
 }

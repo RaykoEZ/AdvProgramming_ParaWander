@@ -19,6 +19,8 @@ namespace UnitTests {
                    << _val << " is outside the range " << _min << " to " << _max;
     }
 
+
+
     namespace WorldTest
     {
         int one(){ return 1;}
@@ -89,13 +91,13 @@ namespace UnitTests {
         }
 
     }
+    //---------------------------------------------------------------------------------------------------
     namespace BoidTest
     {
-
-        World testWorld =  World(1,10,glm::vec3(0.0f));
         /// Boid Tests -------------------------------------------------------------
         TEST(BoidTest, InitializerTest)
         {
+            World testWorld =  World(1,10,glm::vec3(0.0f));
 
             unsigned int id = 1;
             float m = 10.0f;
@@ -127,6 +129,8 @@ namespace UnitTests {
 
         TEST(BoidTest, RuntimeTest_Motion_No_Collision)
         {
+            World testWorld =  World(1,10,glm::vec3(0.0f));
+
             float dt = 1.0f;
             Boid old = testWorld.m_boids[0];
             /// take a copy of the boid before updating
@@ -143,8 +147,10 @@ namespace UnitTests {
         }
 
 
-        TEST(BoidTest, RuntimeTest_Motion_On_Collision)
+        TEST(BoidTest, RuntimeTest_Motion_On_Collision_One_Neighbour)
         {
+
+            World testWorld =  World(1,10,glm::vec3(0.0f));
 
             glm::vec3 oldP = testWorld.m_boids[0].m_pos;
             unsigned int id = 1;
@@ -173,15 +179,183 @@ namespace UnitTests {
             testWorld.m_boids[0].tick(0.0f);
             testWorld.m_boids[1].tick(0.0f);
 
+            Boid::NeighbourInfo testInfo1 = testWorld.m_boids[0].getAverageNeighbourPos();
+            Boid::NeighbourInfo testInfo2 = testWorld.m_boids[1].getAverageNeighbourPos();
+
+            /// Check if neighbourhood function detects:
+            /// - collission
+            /// - number of neighbourhood members excluding self
+            /// - correct average position of the neighbourhood
+
+            /// There should be a collision
+            EXPECT_TRUE(testInfo1.m_isThereCollision);
+            EXPECT_TRUE(testInfo2.m_isThereCollision);
+
+            /// They are each other's neighbours, so they would say they'd both have 1 neighbour
+            EXPECT_EQ(testInfo1.m_numNeighbour,(unsigned int)1);
+            EXPECT_EQ(testInfo1.m_numNeighbour,(unsigned int)1);
+
+            /// if only 1 member in neighbourhood, average = the position of one another
+            EXPECT_FLOAT_EQ(testInfo1.m_averagePos.x,testWorld.m_boids[1].m_pos.x);
+            EXPECT_FLOAT_EQ(testInfo1.m_averagePos.y,testWorld.m_boids[1].m_pos.y);
+            EXPECT_FLOAT_EQ(testInfo1.m_averagePos.z,testWorld.m_boids[1].m_pos.z);
+
+            EXPECT_FLOAT_EQ(testInfo2.m_averagePos.x,testWorld.m_boids[0].m_pos.x);
+            EXPECT_FLOAT_EQ(testInfo2.m_averagePos.y,testWorld.m_boids[0].m_pos.y);
+            EXPECT_FLOAT_EQ(testInfo2.m_averagePos.z,testWorld.m_boids[0].m_pos.z);
+
+            /// Verifying is collision forwarding is working
             /// First boid would detect second boid for collision as it's updated before second boid
             /// Second would not handle collision if first boid is already moving away
             EXPECT_TRUE(testWorld.m_boids[0].getCollision());
             EXPECT_TRUE(testWorld.m_boids[1].getCollision());
 
+
+
+
         }
+
+        TEST(BoidTest, RunTimeTest_On_Collision_More_Than_One_Neighbour)
+        {
+            World testWorld =  World(1,10,glm::vec3(0.0f));
+
+            glm::vec3 oldP = testWorld.m_boids[0].m_pos;
+            unsigned int id = 1;
+            float m = 10.0f;
+            glm::vec3 pos = glm::vec3(oldP.x,oldP.y,0.0f);
+            glm::vec3 v = glm::vec3(0.0f);
+            float vMax = 10.0f;
+            /// Set the second boid to the position of our first boid in the world
+            //Boid testBoid = Boid(id, m, pos,v, vMax, &testWorld);
+            /// Add second test boid to the world's list of managed boids
+            testWorld.m_boids.push_back(Boid(id, m, pos + 1.0f, v, vMax, &testWorld));
+            /// Testing for more than 1 neighbours excluding self
+            testWorld.m_boids.push_back(Boid(id+1, m, pos +2.0f, v, vMax, &testWorld));
+
+
+            std::vector<Boid::NeighbourInfo> testInfo;
+            /// update the two boids in the following order
+            ///
+            /// Check if neighbourhood function detects:
+            /// - collission
+            /// - number of neighbourhood members excluding self
+            /// - correct average position of the neighbourhood
+            for(int i = 0; i < 3; ++i)
+            {
+                testWorld.m_boids[i].tick(0.0f);
+                testInfo.push_back(testWorld.m_boids[i].getAverageNeighbourPos());
+                EXPECT_TRUE(testInfo[i].m_isThereCollision);
+                /// They are each other's neighbours, so they would say they'd both have 1 neighbour
+                EXPECT_EQ(testInfo[i].m_numNeighbour,(unsigned int)2);
+
+                /// Verifying is collision forwarding is working
+                /// First boid would detect second boid for collision as it's updated before second boid
+                /// Second would not handle collision if first boid is already moving away
+                EXPECT_TRUE(testWorld.m_boids[i].getCollision());
+            }
+
+            /// Get average positions of each boid
+            /// 2 members in neighbourhood = (N1 + N2) / 2 for average
+
+            glm::vec3 averageP1 = glm::vec3((testWorld.m_boids[1].m_pos.x + testWorld.m_boids[2].m_pos.x),
+                                            (testWorld.m_boids[1].m_pos.y + testWorld.m_boids[2].m_pos.y),
+                                            (testWorld.m_boids[1].m_pos.z + testWorld.m_boids[2].m_pos.z)) / 2.0f;
+
+            glm::vec3 averageP2 = glm::vec3((testWorld.m_boids[2].m_pos.x + testWorld.m_boids[0].m_pos.x),
+                                            (testWorld.m_boids[2].m_pos.y + testWorld.m_boids[0].m_pos.y),
+                                            (testWorld.m_boids[2].m_pos.z + testWorld.m_boids[0].m_pos.z)) / 2.0f;
+
+            glm::vec3 averageP3 = glm::vec3((testWorld.m_boids[1].m_pos.x + testWorld.m_boids[0].m_pos.x),
+                                            (testWorld.m_boids[1].m_pos.y + testWorld.m_boids[0].m_pos.y),
+                                            (testWorld.m_boids[1].m_pos.z + testWorld.m_boids[0].m_pos.z)) / 2.0f;
+
+            /// Now we verify average position
+            EXPECT_FLOAT_EQ(testInfo[0].m_averagePos.x,averageP1.x);
+            EXPECT_FLOAT_EQ(testInfo[0].m_averagePos.y,averageP1.y);
+            EXPECT_FLOAT_EQ(testInfo[0].m_averagePos.z,averageP1.z);
+
+            EXPECT_FLOAT_EQ(testInfo[1].m_averagePos.x,averageP2.x);
+            EXPECT_FLOAT_EQ(testInfo[1].m_averagePos.y,averageP2.y);
+            EXPECT_FLOAT_EQ(testInfo[1].m_averagePos.z,averageP2.z);
+
+            EXPECT_FLOAT_EQ(testInfo[2].m_averagePos.x,averageP3.x);
+            EXPECT_FLOAT_EQ(testInfo[2].m_averagePos.y,averageP3.y);
+            EXPECT_FLOAT_EQ(testInfo[2].m_averagePos.z,averageP3.z);
+
+
+        }
+
+
 
     }
 
+//-------------------------------------------------------------------------------------------------------
+
+    /// tests for FlockActions' free functions
+    namespace SteeringFunctionTest
+    {
+
+        TEST(SteeringFunctionTest, Seeking_Test)
+        {
+            /// Case for pos == target
+            glm::vec3 v = FlockFunctions::seek(glm::vec3(0.0f),glm::vec3(0.0f),1.0f,glm::vec3(0.0f));
+            EXPECT_FLOAT_EQ(v.x, 0.0f);
+            EXPECT_FLOAT_EQ(v.y, 0.0f);
+            EXPECT_FLOAT_EQ(v.z, 0.0f);
+            /// Case for pos != target
+            glm::vec3 expectedV = glm::normalize(glm::vec3(1.0f));
+            v = FlockFunctions::seek(glm::vec3(0.0f),glm::vec3(0.0f),1.0f,glm::vec3(1.0f));
+            EXPECT_FLOAT_EQ(v.x, expectedV.x);
+            EXPECT_FLOAT_EQ(v.y, expectedV.y);
+            EXPECT_FLOAT_EQ(v.z, expectedV.z);
+
+
+
+        }
+
+        TEST(SteeringFunctionTest, Fleeing_Test)
+        {
+            /// Case for pos == target
+            glm::vec3 v = FlockFunctions::flee(glm::vec3(0.0f),glm::vec3(0.0f),1.0f,glm::vec3(0.0f));
+            EXPECT_FLOAT_EQ(v.x, 0.0f);
+            EXPECT_FLOAT_EQ(v.y, 0.0f);
+            EXPECT_FLOAT_EQ(v.z, 0.0f);
+
+            /// Case for pos != target
+            glm::vec3 expectedV = glm::normalize(glm::vec3(-1.0f));
+            v = FlockFunctions::flee(glm::vec3(0.0f),glm::vec3(0.0f),1.0f,glm::vec3(1.0f));
+            EXPECT_FLOAT_EQ(v.x, expectedV.x);
+            EXPECT_FLOAT_EQ(v.y, expectedV.y);
+            EXPECT_FLOAT_EQ(v.z, expectedV.z);
+
+        }
+
+        TEST(SteeringFunctionTest, Wander_Test)
+        {
+            /// Case for zero vectors
+            glm::vec3 target = FlockFunctions::wander(glm::vec3(0.0f),glm::vec3(0.0f));
+
+            /// 10.0f is the hardcoded radius of wandering directional selection radius at a future location
+            /// If future is stationary due to zero direction vector, we simply search for 10.0f units around us
+            EXPECT_TRUE(isBetweenInclusive(target.x,-10.0f, 10.0f));
+            EXPECT_TRUE(isBetweenInclusive(target.y, -10.0f,10.0f));
+            /// 2d wandering, z ignored
+            EXPECT_FLOAT_EQ(target.z, 0.0f);
+
+
+
+            /// Now we have initial velocity/direction vector
+            ///
+            /// Future should be at (10,10,0) with a future radius of 10 with a direction of (1,1,0)
+            target = FlockFunctions::wander(glm::vec3(0.0f),glm::vec3(1.0f,1.0f,0.0f));
+            EXPECT_TRUE(isBetweenInclusive(target.x,0.0f, 20.0f));
+            EXPECT_TRUE(isBetweenInclusive(target.y, 0.0f,20.0f));
+            /// 2d wandering, z ignored
+            EXPECT_FLOAT_EQ(target.z, 0.0f);
+
+        }
+
+    }
 
 }
 
