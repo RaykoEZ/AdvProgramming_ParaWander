@@ -1,8 +1,7 @@
-#include "FlockSystem.cuh"
+#include "FlockSystem.h"
 #include <cuda_runtime.h>
 #include <cuda.h>
 #include <cuda_runtime_api.h>
-#include <curand.h>
 #include <device_functions.h>
 #include <thrust/device_vector.h>
 
@@ -24,6 +23,13 @@ FlockSystem::~FlockSystem()
     clear();
 }
 
+void FlockSystem::init(const unsigned int &_numP, const unsigned int &_res)
+{
+
+
+}
+
+
 void FlockSystem::setup(const unsigned int &_numP, const unsigned int &_res)
 {
 
@@ -39,5 +45,9 @@ void FlockSystem::tick(const float &_dt)
 void FlockSystem::clear()
 {
 
+
+}
+void FlockSystem::createSpawnCircle(const float &_rad, const float3 &_origin)
+{
 
 }

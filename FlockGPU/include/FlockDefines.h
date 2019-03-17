@@ -12,6 +12,9 @@
     #define CUDART_RADIAN_F 3.141592654f/180.0f
 #endif
 
+/// Define the null hash in case the particle manages to make it's way out of the bounding grid
+#define NULL_HASH UINT_MAX
+
 #define DEFAULT_MASS 10.0f
 #define DEFAULT_MASS_INV 1.0f/DEFAULT_MASS
 
