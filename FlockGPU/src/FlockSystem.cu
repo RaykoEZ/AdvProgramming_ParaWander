@@ -21,11 +21,12 @@ FlockSystem::FlockSystem(const unsigned int &_numP, const float &_m, const float
 FlockSystem::~FlockSystem()
 {
     clear();
+    delete m_params;
 }
 
 void FlockSystem::init(const unsigned int &_numP, const unsigned int &_res)
 {
-
+    clear();
 
 }
 
@@ -44,6 +45,13 @@ void FlockSystem::tick(const float &_dt)
 
 void FlockSystem::clear()
 {
+    m_pos.clear();
+    m_v.clear();
+    m_target.clear();
+    m_isThereCollision.clear();
+    m_hash.clear();
+    m_cellOcc.clear();
+    m_scatterAddress.clear();
 
 
 }

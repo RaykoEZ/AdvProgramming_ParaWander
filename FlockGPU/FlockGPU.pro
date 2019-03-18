@@ -1,5 +1,5 @@
 include($${PWD}/../common.pri)
-include($${PWD}/../cuda_compiler.pri)
+
 
 TARGET = FlockGPU
 DEFINES += FLOCKGPU_LIBRARY
@@ -34,3 +34,10 @@ INCLUDEPATH +=./include
 #
 # # Set this up as the installation directory for our library
 TARGET = $$LIB_INSTALL_DIR/flock
+
+
+CUDA_OBJECTS_DIR = cudaobj
+CUDA_SOURCES += $$files($$PWD/src/*.cu)
+
+
+include($${PWD}/../cuda_compiler.pri)
