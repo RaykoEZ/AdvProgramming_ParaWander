@@ -9,7 +9,7 @@ class FlockSystem {
 
 public:
     /// Constructor
-    FlockSystem(const unsigned int &_numP,
+    FlockSystem(const uint &_numP,
                 const float &_m,
                 const float &_vMax,
                 const float &_dt);
@@ -18,12 +18,12 @@ public:
     ~FlockSystem();
 
     /// Initialise a relatively standard dambreak simulation
-    void setup(const unsigned int &_numP, const uint &_res);
+    void setup(const uint &_numP, const uint &_res);
 protected:
     /// Keep track of whether the simulation is ready to start
     bool m_finishedInit;
 
-    void init(const unsigned int &_numP, const uint &_res);
+    void init(const uint &_numP, const uint &_res);
 
     void tick(const float &_dt = DEFAULT_TIMESTEP);
     void clear();
