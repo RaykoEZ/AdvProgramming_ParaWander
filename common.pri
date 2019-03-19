@@ -1,6 +1,6 @@
 # as I want to support 4.8 and 5 this will set a flag for some of the mac stuff
 # mainly in the types.h file for the setMacVisual which is native in Qt5
-QT       += core
+QT       -= core
 isEqual(QT_MAJOR_VERSION, 5) {
         cache()
         DEFINES +=QT5BUILD
@@ -31,7 +31,7 @@ win32:
     INCLUDEPATH+= $$PWD/../../glm
 
 }
-
+CONFIG += console c++11
 CONFIG-=app_bundle
 # flags taken from Jack Diver's qt setup:
 # https://github.com/nitronoid/flo/blob/master/common.pri

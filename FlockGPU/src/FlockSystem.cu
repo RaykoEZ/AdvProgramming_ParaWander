@@ -24,14 +24,14 @@ FlockSystem::~FlockSystem()
     delete m_params;
 }
 
-void FlockSystem::init(const unsigned int &_numP, const unsigned int &_res)
+void FlockSystem::init(const uint &_numP, const uint&_res)
 {
     clear();
 
 }
 
 
-void FlockSystem::setup(const unsigned int &_numP, const unsigned int &_res)
+void FlockSystem::setup(const uint &_numP, const uint &_res)
 {
 
 
@@ -55,7 +55,7 @@ void FlockSystem::clear()
 
 
 }
-void FlockSystem::createSpawnCircle(const float &_rad, const float3 &_origin)
+void FlockSystem::spawnInRadius(const float &_rad, const float3 &_origin)
 {
 
 }
