@@ -6,7 +6,7 @@
 
 struct FlockData
 {
-    unsigned int m_numParticles;
+    unsigned int m_numBoids;
     float m_mass;
     float m_invMass;
     float m_vMax;
@@ -20,7 +20,7 @@ class FlockParams
 {
 public:
     FlockParams(
-    const unsigned int &_numP,
+    const unsigned int &_numB,
     const float &_m,
     const float &_vMax,
     const float &_dt);
@@ -29,7 +29,7 @@ public:
 
     void init();
 
-    unsigned int getNumParticles() const { return m_data.m_numParticles;}
+    unsigned int getNumBoids() const { return m_data.m_numBoids;}
 
     float getMass() const { return m_data.m_mass;}
 
@@ -42,7 +42,7 @@ public:
 
 
 
-    void setNumParticles(const unsigned int &_numP);
+    void setNumBoids(const unsigned int &_numB);
 
     void setMass(const float &_m);
 

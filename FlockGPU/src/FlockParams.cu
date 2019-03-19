@@ -3,12 +3,12 @@
 
 __constant__ FlockData globalParams;
 
-FlockParams::FlockParams(const unsigned int &_numP,
+FlockParams::FlockParams(const unsigned int &_numB,
                               const float &_m,
                               const float &_vMax,
                               const float &_dt)
 {
-    setNumParticles(_numP);
+    setNumBoids(_numB);
     setMass(_m);
     setInverseMass(_m);
     setVMax(_vMax);
@@ -26,9 +26,9 @@ void FlockParams::init()
 
 }
 
-void FlockParams::setNumParticles(const unsigned int &_numP)
+void FlockParams::setNumBoids(const unsigned int &_numB)
 {
-    m_data.m_numParticles=_numP;
+    m_data.m_numBoids=_numB;
 }
 
 void FlockParams::setMass(const float &_m)
