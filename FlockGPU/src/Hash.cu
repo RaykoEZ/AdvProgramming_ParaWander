@@ -27,16 +27,16 @@ __device__ uint PointHashOperator::operator()(const float3 &_pos)
 {
     // Note that finding the grid coordinates are much simpler if the grid is over the range [0,1] in
     // each dimension and the points are also in the same space.
-    //int3 grid = grid_from_point(_pos);
+    int3 grid = grid_from_point(_pos);
 
     // Compute the hash for this grid cell
-    //uint hash = cell_from_grid(grid);
+    uint hash = cell_from_grid(grid);
 
     // Calculate the cell occupancy counter here to save on an extra kernel launch (won't trigger if out of bounds)
-    //if (hash != NULL_HASH)
-    //{
-    //    atomicAdd(&m_cellOcc[hash], 1);
-    //}
+    if (hash != NULL_HASH)
+    {
+        atomicAdd(&m_cellOcc[hash], 1);
+    }
 
     // Return the cell idx (NULL_HASH if out of bounds)
     return 0; //hash;

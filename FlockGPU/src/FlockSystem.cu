@@ -53,14 +53,31 @@ void FlockSystem::tick(const float &_dt)
     float3 * pos = thrust::raw_pointer_cast(&m_pos[0]);
     float3 * velocity = thrust::raw_pointer_cast(&m_v[0]);
     float3 * targetPos = thrust::raw_pointer_cast(&m_target[0]);
-    float3 * colour = thrust::raw_pointer_cast(&m_col[0]);
+    //float3 * colour = thrust::raw_pointer_cast(&m_col[0]);
     uint * hash = thrust::raw_pointer_cast(&m_hash[0]);
     uint * cellOcc = thrust::raw_pointer_cast(&m_cellOcc[0]);
     uint * scatter = thrust::raw_pointer_cast(&m_scatterAddress[0]);
+    /// copy global parameters to gpu
+    m_params->init()
+
 
     thrust::fill(m_cellOcc.begin(), m_cellOcc.end(), 0);
-
+    PointHashOperator hashOp(cellOcc);
+    thrust::transform(m_pos.begin(), m_pos.end(), m_hash.begin(), hashOp);
+    
+    thrust::sort_by_key(m_Hash.begin(),
+    m_Hash.end(),
+    thrust::make_zip_iterator(thrust::make_tuple(m_pos.begin(),m_v.begin(), m_target.begin()));
+   
+    thrust::exclusive_scan(m_cellOcc.begin(), m_cellOcc.end(), m_scatterAddress.begin());
+    uint maxCellOcc = thrust::reduce(m_cellOcc.begin(), m_cellOcc.end(), 0, thrust::maximum<unsigned int>());
+   
+    /// define block dims to solve for ths frame
+    uint blockSize = 32 * ceil(maxCellOcc / 32.0f);
+    dim3 gridDim(m_params->getRes(), m_params->getRes(), m_params->getRes());
     /// We update boids in gpu below
+
+
 }
 
 void FlockSystem::clear()

@@ -6,13 +6,15 @@ __constant__ FlockData globalParams;
 FlockParams::FlockParams(const unsigned int &_numB,
                               const float &_m,
                               const float &_vMax,
-                              const float &_dt)
+                              const float &_dt,
+                              const unsigned int &_res)
 {
     setNumBoids(_numB);
     setMass(_m);
     setInverseMass(_m);
     setVMax(_vMax);
     setTimeStep(_dt);
+    setRes(_res);
 }
 
 void FlockParams::init()
@@ -56,4 +58,13 @@ void FlockParams::setTimeStep(const float &_dt)
 {
 
     m_data.m_dt=_dt;
+}
+
+void FlockParams::setRes(const unsigned int &_res)
+{
+    m_data.m_res = _res;
+    m_data.m_res2 = _res * _res;
+    m_data.m_invRes = 1.0f/_res;
+    m_data.m_invRes2 = m_data.m_invRes * m_data.m_invRes;
+
 }
