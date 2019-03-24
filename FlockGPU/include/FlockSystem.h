@@ -35,10 +35,11 @@ protected:
     thrust::device_vector<uint> m_scatterAddress;
     /// @brief a random number between 0 and 1 for steering angle
     thrust::device_vector<float> m_angle;
+    thrust::device_vector<half3> m_col;
     thrust::device_vector<float3> m_pos;
     thrust::device_vector<float3> m_v;
     thrust::device_vector<float3> m_target;
-    thrust::device_vector<float3> m_col;
+
 
 
 

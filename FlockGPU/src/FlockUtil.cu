@@ -1,5 +1,5 @@
 #include "FlockUtil.cuh"
-
+#include "helper_math.h"
 /**
  * Compute a grid position from a point. Note that the grid position can be negative in this case
  * if the point is outside [0,1] range. Sanity checks will need to be performed elsewhere.
@@ -42,4 +42,18 @@ __device__ float dist2(const float3 &_pos1, const float3 &_pos2)
 {
     float3 diff = _pos1 - _pos2;
     return dot(diff, diff);
+}
+
+/// _angle in radians
+__device__ float3 rotateZ(const float3 &_v, const float &_angle)
+{
+    float3 res = _v;
+    
+    float Cos = (cosf(_angle));
+    float Sin = (sinf(_angle));
+
+    res.x = _v.x * Cos - _v.y * Sin;
+    res.y = _v.x * Sin + _v.y * Cos;
+    return res;
+
 }

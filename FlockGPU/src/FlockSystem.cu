@@ -61,7 +61,7 @@ void FlockSystem::tick(const float &_dt)
     float3 * pos = thrust::raw_pointer_cast(&m_pos[0]);
     float3 * velocity = thrust::raw_pointer_cast(&m_v[0]);
     float3 * targetPos = thrust::raw_pointer_cast(&m_target[0]);
-    
+    half3 * colour = thrust::raw_pointer_cast(&m_target[0]);
     bool * collision = thrust::raw_pointer_cast(&m_isThereCollision[0]);
     float * angle = thrust::raw_pointer_cast(&m_angle[0]);
     uint * hash = thrust::raw_pointer_cast(&m_hash[0]);
@@ -69,15 +69,16 @@ void FlockSystem::tick(const float &_dt)
     uint * scatter = thrust::raw_pointer_cast(&m_scatterAddress[0]);
     /// copy global parameters to gpu
     m_params->init()
-
+    /// Set random floats for boid wandering search angle
+    randomFloats(angle, m_params->getNumBoids());
     /// flush prior occupancy out and put new occupancy data in
     thrust::fill(m_cellOcc.begin(), m_cellOcc.end(), 0);
     PointHashOperator hashOp(cellOcc);
     thrust::transform(m_pos.begin(), m_pos.end(), m_hash.begin(), hashOp);
-    
+
     thrust::sort_by_key(m_Hash.begin(),
     m_Hash.end(),
-    thrust::make_zip_iterator(thrust::make_tuple(m_pos.begin(),m_v.begin(), m_target.begin(), m_isThereCollision.begin()));
+    thrust::make_zip_iterator(thrust::make_tuple(m_pos.begin(),m_v.begin(), m_target.begin(), m_angle.begin(), m_isThereCollision.begin()));
    
     thrust::exclusive_scan(m_cellOcc.begin(), m_cellOcc.end(), m_scatterAddress.begin());
     uint maxCellOcc = thrust::reduce(m_cellOcc.begin(), m_cellOcc.end(), 0, thrust::maximum<unsigned int>());
@@ -87,10 +88,8 @@ void FlockSystem::tick(const float &_dt)
     dim3 gridSize(m_params->getRes(), m_params->getRes());
     /// We update boids in gpu below
 
-    /// Set random floats for boid wandering search angle
-    randomFloats(angle, m_params->getNumBoids());
-
-    /// Spatial hash values, cell occupancy, memory scatter offset ( scatter addresses), positions and direction are already initialized, now we:
+    /// Spatial hash values, cell occupancy, memory scatter offset ( scatter addresses), 
+    /// positions and direction are already initialized, now we:
     /// - determine neighbourhood and collision flag
     /// - calculate target position and behaviour depending on collision flag
     /// - resolve forces
