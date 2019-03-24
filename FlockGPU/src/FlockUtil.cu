@@ -38,3 +38,8 @@ __device__ uint3 gridFromCell(const uint cell)
     ret_val.x = (cell - ret_val.z * globalParams.m_res2 - ret_val.y * globalParams.m_res);
     return ret_val;
 }
+__device__ float dist2(const float3 &_pos1, const float3 &_pos2)
+{
+    float3 diff = _pos1 - _pos2;
+    return dot(diff, diff);
+}
