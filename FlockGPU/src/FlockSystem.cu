@@ -4,12 +4,12 @@
 #include <vector>
 #include <iostream>
 #include "FlockParams.cuh"
-#include "FloackKernels.cuh"
+#include "FlockKernels.cuh"
 #include "Random.cuh"
 
-FlockSystem::FlockSystem(const uint &_numP, const float &_m, const float &_vMax, const float &_dt, const float &_rad)
+FlockSystem::FlockSystem(const uint &_numP, const float &_m, const float &_vMax, const float &_dt, const float &_rad, const float &_res)
 {
-    m_params = new FlockParams(_numP,_m,_vMax,_dt);
+    m_params = new FlockParams(_numP,_m,_vMax,_dt,_res);
     m_params->setNumBoids(_numP);
     if(_m > 0.0f)
     {
@@ -35,7 +35,7 @@ FlockSystem::~FlockSystem()
     delete m_params;
 }
 
-void FlockSystem::init(const uint &_numP, const uint &_res)
+void FlockSystem::init(const uint &_numBoids, const uint &_res)
 {
     clear();
     /// reserve vectors for future storage
@@ -45,12 +45,12 @@ void FlockSystem::init(const uint &_numP, const uint &_res)
     m_col.reserve(m_params->getNumBoids());
     m_angle.reserve(m_params->getNumBoids());    
     m_hash.reserve(m_params->getNumBoids());
-    m_cellOcc.reserve(m_params->getNumBoids());
-    m_scatterAddress.reserve(m_params->getNumBoids());
+    m_cellOcc.reserve(_res*_res*_res);
+    m_scatterAddress.reserve(_res*_res*_res);
     m_isThereCollision.reserve(m_params->getNumBoids());
 
     
-    prepareBoids(m_spawnRad,make_float3(0.0f,0.0f,0.0f));
+    prepareBoids(_numBoids, m_spawnRad,make_float3(0.0f,0.0f,0.0f));
 }
 
 
@@ -61,14 +61,14 @@ void FlockSystem::tick(const float &_dt)
     float3 * pos = thrust::raw_pointer_cast(&m_pos[0]);
     float3 * velocity = thrust::raw_pointer_cast(&m_v[0]);
     float3 * targetPos = thrust::raw_pointer_cast(&m_target[0]);
-    half3 * colour = thrust::raw_pointer_cast(&m_target[0]);
+    float3 * colour = thrust::raw_pointer_cast(&m_target[0]);
     bool * collision = thrust::raw_pointer_cast(&m_isThereCollision[0]);
     float * angle = thrust::raw_pointer_cast(&m_angle[0]);
     uint * hash = thrust::raw_pointer_cast(&m_hash[0]);
     uint * cellOcc = thrust::raw_pointer_cast(&m_cellOcc[0]);
     uint * scatter = thrust::raw_pointer_cast(&m_scatterAddress[0]);
     /// copy global parameters to gpu
-    m_params->init()
+    //m_params->init();
     /// Set random floats for boid wandering search angle
     randomFloats(angle, m_params->getNumBoids());
     /// flush prior occupancy out and put new occupancy data in
@@ -76,9 +76,9 @@ void FlockSystem::tick(const float &_dt)
     PointHashOperator hashOp(cellOcc);
     thrust::transform(m_pos.begin(), m_pos.end(), m_hash.begin(), hashOp);
 
-    thrust::sort_by_key(m_Hash.begin(),
-    m_Hash.end(),
-    thrust::make_zip_iterator(thrust::make_tuple(m_pos.begin(),m_v.begin(), m_target.begin(), m_angle.begin(), m_isThereCollision.begin()));
+    thrust::sort_by_key(m_hash.begin(),
+    m_hash.end(),
+    thrust::make_zip_iterator(thrust::make_tuple(m_pos.begin(),m_v.begin(), m_target.begin(), m_angle.begin(), m_isThereCollision.begin())));
    
     thrust::exclusive_scan(m_cellOcc.begin(), m_cellOcc.end(), m_scatterAddress.begin());
     uint maxCellOcc = thrust::reduce(m_cellOcc.begin(), m_cellOcc.end(), 0, thrust::maximum<unsigned int>());
@@ -122,7 +122,7 @@ void FlockSystem::clear()
 
 
 }
-void FlockSystem::prepareBoids(const float &_rad, const float3 &_origin)
+void FlockSystem::prepareBoids(const float &_nBoids, const float &_rad, const float3 &_origin)
 {
     std::random_device rd;
     std::mt19937_64 gen(rd());
@@ -131,8 +131,8 @@ void FlockSystem::prepareBoids(const float &_rad, const float3 &_origin)
     std::uniform_real_distribution<float> vDis(-1.0f, 1.0f);
     //std::uniform_real_distribution<float> vMaxDis(1.0f, 10.0f);
 
-    thrust::host_vector posHost;
-    thrust::host_vector vHost;
+    thrust::host_vector<float3> posHost;
+    thrust::host_vector<float3> vHost;
     float3 pos;
     float3 v;
     for(unsigned int i = 0; i < _nBoids; ++i)

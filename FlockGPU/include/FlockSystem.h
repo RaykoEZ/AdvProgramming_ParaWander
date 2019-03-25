@@ -15,17 +15,18 @@ public:
                 const float &_m,
                 const float &_vMax,
                 const float &_dt,
-                const float &_rad);
+                const float &_rad,
+                const float &_res);
 
     /// Destruct our fluid system
     ~FlockSystem();
-    void init(const uint &_numP, const uint &_res);
+    void init(const uint &_numBoids, const uint &_res);
 protected:
 
 
     void tick(const float &_dt = DEFAULT_TIMESTEP);
     void clear();
-    void prepareBoids(const float &_rad, const float3 &_origin);
+    void prepareBoids(const float &_nBoids, const float &_rad, const float3 &_origin);
     /// Keep track of whether the simulation is ready to start
     bool m_finishedInit;
     float m_spawnRad;
@@ -35,7 +36,7 @@ protected:
     thrust::device_vector<uint> m_scatterAddress;
     /// @brief a random number between 0 and 1 for steering angle
     thrust::device_vector<float> m_angle;
-    thrust::device_vector<half3> m_col;
+    thrust::device_vector<float3> m_col;
     thrust::device_vector<float3> m_pos;
     thrust::device_vector<float3> m_v;
     thrust::device_vector<float3> m_target;

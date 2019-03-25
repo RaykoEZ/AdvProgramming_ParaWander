@@ -19,6 +19,7 @@ struct FlockData
     float m_dt;
     
 };
+
 extern __constant__ FlockData paramData;
 
 /// Class to manage the storage

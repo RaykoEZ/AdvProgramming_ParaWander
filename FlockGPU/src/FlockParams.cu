@@ -1,7 +1,7 @@
 #include "FlockParams.cuh"
 #include <iostream>
 
-__constant__ FlockData globalParams;
+__constant__ FlockData paramData;
 
 FlockParams::FlockParams(const unsigned int &_numB,
                               const float &_m,
@@ -15,11 +15,12 @@ FlockParams::FlockParams(const unsigned int &_numB,
     setVMax(_vMax);
     setTimeStep(_dt);
     setRes(_res);
+    init();
 }
 
 void FlockParams::init()
 {
-    cudaError_t err = cudaMemcpyToSymbol(globalParams, &m_data, sizeof(FlockData));
+    cudaError_t err = cudaMemcpyToSymbol(paramData, &m_data, sizeof(FlockData));
     if (err != cudaSuccess)
     {
         std::cerr << "Copy to symbol params (size=" << sizeof(FlockParams) << ") failed! Reason: " << cudaGetErrorString(err) << "\n";

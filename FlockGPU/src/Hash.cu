@@ -4,7 +4,7 @@
 #include <cuda.h>
 #include <cuda_runtime_api.h>
 #include <device_functions.h>
-
+#include "FlockUtil.cuh"
 
 // For thrust routines (e.g. stl-like operators and algorithms on vectors)
 #include <thrust/host_vector.h>
@@ -27,10 +27,10 @@ __device__ uint PointHashOperator::operator()(const float3 &_pos)
 {
     // Note that finding the grid coordinates are much simpler if the grid is over the range [0,1] in
     // each dimension and the points are also in the same space.
-    int3 grid = grid_from_point(_pos);
+    int3 grid = gridFromPoint(_pos);
 
     // Compute the hash for this grid cell
-    uint hash = cell_from_grid(grid);
+    uint hash = cellFromGrid(grid);
 
     // Calculate the cell occupancy counter here to save on an extra kernel launch (won't trigger if out of bounds)
     if (hash != NULL_HASH)

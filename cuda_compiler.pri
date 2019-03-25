@@ -6,7 +6,9 @@ LIBS += -lcudart -lcurand -licudata -lcudart_static -lcudadevrt
 INCLUDEPATH += \
   ${HOME}/cusplibrary \
   ${CUDA_PATH}/include \
-  ${CUDA_PATH}/include/cuda
+  ${CUDA_PATH}/include/cuda \
+  ${CUDA_SAMPLES}/common/inc
+
 
 CUDA_INC += $$join(INCLUDEPATH, ' -I', '-I', ' ')
 
