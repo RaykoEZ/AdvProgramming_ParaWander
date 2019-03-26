@@ -34,7 +34,7 @@ public:
     const float &_dt,
     const unsigned int &_res);
 
-    ~FlockParams();
+    ~FlockParams(){}
 
     void init();
 

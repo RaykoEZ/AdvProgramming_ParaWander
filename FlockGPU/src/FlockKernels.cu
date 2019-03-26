@@ -126,7 +126,7 @@ __device__ void resolveForce(
          _v = normalize(_v);
 
     }
-    _pos += _v * paramData.m_dt;
+    _pos += _v * paramData.m_dt * paramData.m_invRes2;
 
 
 

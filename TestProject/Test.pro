@@ -1,5 +1,5 @@
 include($${PWD}/../common.pri)
-unix:include($${PWD}/../cuda_compiler.pri)
+
 QT      += testlib
 TARGET = FlockTest
 DEFINES += FLOCK_TEST
@@ -18,7 +18,9 @@ SOURCES += $$PWD/src/main.cpp
 unix:{
    LIBS+= -lgtest -lbenchmark
 }
+# link with my libraries
 LIBS+= -L"../FlockCPU" -lFlockCPU
+LIBS+= -L"../FlockGPU" -lFlockGPU
 # where our exe is going to live (root of project)
 DESTDIR=./
 win32:{
@@ -34,5 +36,5 @@ win32:{
                $$GTEST_DIR/googlemock/src/gmock-all.cc
 }
 
-
+unix:include($${PWD}/../cuda_compiler.pri)
 
