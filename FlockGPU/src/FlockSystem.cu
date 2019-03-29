@@ -42,15 +42,15 @@ void FlockSystem::init()
     clear();
     h_params->init();
     /// reserve vectors for future storage
-    d_pos.reserve(h_params->getNumBoids());
-    d_v.reserve(h_params->getNumBoids());
-    d_target.reserve(h_params->getNumBoids());
-    d_col.reserve(h_params->getNumBoids());
-    d_angle.reserve(h_params->getNumBoids());
-    d_hash.reserve(h_params->getNumBoids());
-    d_cellOcc.reserve(h_params->getRes2());
-    d_scatterAddress.reserve(h_params->getRes2());
-    d_isThereCollision.reserve(h_params->getNumBoids());
+    d_pos.resize(h_params->getNumBoids());
+    d_v.resize(h_params->getNumBoids());
+    d_target.resize(h_params->getNumBoids());
+    d_col.resize(h_params->getNumBoids());
+    d_angle.resize(h_params->getNumBoids());
+    d_hash.resize(h_params->getNumBoids(),0);
+    d_cellOcc.resize(h_params->getRes2(),0);
+    d_scatterAddress.resize(h_params->getRes2());
+    d_isThereCollision.resize(h_params->getNumBoids());
 
     
     prepareBoids(h_params->getNumBoids(), 0.1f,0.1f,
@@ -93,7 +93,8 @@ void FlockSystem::tick()
 
 
 
-    thrust::sort_by_key(d_hash.begin(),
+    thrust::sort_by_key(
+    d_hash.begin(),
     d_hash.end(),
     thrust::make_zip_iterator(thrust::make_tuple(d_pos.begin(),
                                                  d_v.begin(),
