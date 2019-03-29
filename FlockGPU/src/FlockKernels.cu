@@ -37,7 +37,7 @@ __global__ void computeAvgNeighbourPos(
                     // Determine the index of the neighbouring point in that cell
                     otherBoidIdx = _scatterAddress[otherCellIdx] + threadInBlockIdx;
                     float d2 = dist2(thisPoint, _pos[otherBoidIdx]);
-                    if ((otherBoidIdx != thisBoidIdx) && (d2 <= paramData.m_invRes2))
+                    if ((otherBoidIdx != thisBoidIdx) && (d2 <= paramData.m_invRes))
                     {
                          /// sum position to prepare for average position
                         sumPos += _pos[otherBoidIdx];
@@ -63,20 +63,23 @@ __global__ void genericBehaviour(
     const bool *_collision, 
     const uint *_cellOcc, 
     const uint *_scatterAddress,
-    const float *_angle)
+    const float *_angle,
+    const float * _vMax)
 {
 
     uint gridCellIdx = cellFromGrid(blockIdx);
     //float3 f;
     ///
+
     if (threadIdx.x < _cellOcc[gridCellIdx])
-    {
+    {       
         uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
         float3 thisPos = _pos[thisBoidIdx];
         float3 thisV = _v[thisBoidIdx];
         float3 f;
         float3 thisTarget = _target[thisBoidIdx];
         float thisAng = _angle[thisBoidIdx];
+        float thisVMax = _vMax[thisBoidIdx];
 
         if(_collision[thisBoidIdx])
         {
@@ -104,14 +107,17 @@ __global__ void genericBehaviour(
 
         }
 
-        resolveForce(thisPos, thisV, f);
+        resolveForce(thisPos, thisV, f,thisVMax);
+        _pos[thisBoidIdx] = thisPos;
+        _v[thisBoidIdx] = thisV;
     }
 }
 
 __device__ void resolveForce(
     float3 &_pos,
     float3 &_v,
-    const float3 &_f)
+    const float3 &_f,
+    const float &_vMax)
 {
 
     float3 accel = _f * paramData.m_invMass;
@@ -121,12 +127,12 @@ __device__ void resolveForce(
     {
 
          _v = clamp(oldV,
-              make_float3(-paramData.m_vMax,-paramData.m_vMax,0.0f),
-              make_float3(paramData.m_vMax,paramData.m_vMax,0.0f));
+              make_float3(-_vMax,-_vMax,0.0f),
+              make_float3(_vMax,_vMax,0.0f));
          _v = normalize(_v);
 
     }
-    _pos += _v * paramData.m_dt * paramData.m_invRes2;
+    _pos += _v * paramData.m_dt;
 
 
 

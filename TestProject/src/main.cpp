@@ -121,8 +121,8 @@ void dumpToGeo(const std::vector<float3> &points,
 int main(int argc, char** argv)
 {
 
-    float dt = 0.5f;
-    unsigned int n = 5;
+    float dt = 0.05f;
+    unsigned int n = 100;
     unsigned int nframes = 1000;
     /// CPU VERSION of Flocking Sim
     ///
@@ -141,23 +141,34 @@ int main(int argc, char** argv)
     */
     /// GPU VERSION
     ///
-    float res = 64.0f;
-    FlockSystem flockSys(n,10.0f,10.0f,dt,1.0f,res);
+
+    float res = 1024;
+    FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
     flockSys.init();
     std::vector<float3> pos;
     std::vector<float3> col;
 
-    pos.reserve(n);
-    col.reserve(n);
+    pos.resize(n);
+    col.resize(n);
 
     for(unsigned int i = 0; i < nframes; ++i)
     {
         std::cout << "Timestep="<<dt * float(i+1) << "\n";
         flockSys.tick();
         flockSys.exportResult(pos,col);
+        std::cout<< "Pos size , ColSize :"<< pos.size()<<", "<< col.size()<< '\n';
         dumpToGeo(pos,col,i);
     }
+    /*
+    for(unsigned int i=0;i<n;++i)
+    {
+        std::cout << "Pos = "<<pos[i].x << ", "<< pos[i].y<< ", " << pos[i].z<< "\n";
+
+        std::cout << "Cols = "<<col[i].x << ", "<< col[i].y<< ", " << col[i].z<< "\n";
+
+    }
+    */
     /// Test run
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();;
+    //testing::InitGoogleTest(&argc, argv);
+    return 0;//RUN_ALL_TESTS();;
 }

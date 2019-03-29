@@ -44,6 +44,7 @@ protected:
     thrust::device_vector<float3> d_col;
     thrust::device_vector<float3> d_pos;
     thrust::device_vector<float3> d_v;
+    thrust::device_vector<float> d_vMax;
     thrust::device_vector<float3> d_target;
 
 

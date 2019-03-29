@@ -1,7 +1,6 @@
 #include "FlockSystem.h"
 #include "Hash.cuh"
 #include <random>
-
 #include <iostream>
 #include "FlockParams.cuh"
 #include "FlockKernels.cuh"
@@ -44,13 +43,19 @@ void FlockSystem::init()
     /// reserve vectors for future storage
     d_pos.resize(h_params->getNumBoids());
     d_v.resize(h_params->getNumBoids());
+    d_vMax.resize(h_params->getNumBoids());
     d_target.resize(h_params->getNumBoids());
     d_col.resize(h_params->getNumBoids());
+
     d_angle.resize(h_params->getNumBoids());
     d_hash.resize(h_params->getNumBoids(),0);
     d_cellOcc.resize(h_params->getRes2(),0);
     d_scatterAddress.resize(h_params->getRes2());
     d_isThereCollision.resize(h_params->getNumBoids());
+
+
+    thrust::fill(d_col.begin(), d_col.end(),make_float3(0.0f,255.0f,0.0f));
+    thrust::fill(d_isThereCollision.begin(), d_isThereCollision.end(),false);
 
     
     prepareBoids(h_params->getNumBoids(), 0.1f,0.1f,
@@ -73,11 +78,15 @@ void FlockSystem::tick()
 {
     if(!h_init) return;
 
+
+
+
     /// We cast to raw ptr for kernel calls
     float3 * pos = thrust::raw_pointer_cast(&d_pos[0]);
     float3 * velocity = thrust::raw_pointer_cast(&d_v[0]);
     float3 * targetPos = thrust::raw_pointer_cast(&d_target[0]);
     float3 * colour = thrust::raw_pointer_cast(&d_col[0]);
+    float * vMax = thrust::raw_pointer_cast(&d_vMax[0]);
     bool * collision = thrust::raw_pointer_cast(&d_isThereCollision[0]);
     float * angle = thrust::raw_pointer_cast(&d_angle[0]);
     uint * cellOcc = thrust::raw_pointer_cast(&d_cellOcc[0]);
@@ -100,7 +109,9 @@ void FlockSystem::tick()
                                                  d_v.begin(),
                                                  d_target.begin(),
                                                  d_angle.begin(),
-                                                 d_isThereCollision.begin()
+                                                 d_isThereCollision.begin(),
+                                                 d_col.begin(),
+                                                 d_vMax.begin()
                                                  )));
 
     thrust::exclusive_scan(d_cellOcc.begin(), d_cellOcc.end(), d_scatterAddress.begin());
@@ -136,11 +147,10 @@ void FlockSystem::tick()
                                                collision,
                                                cellOcc,
                                                scatter,
-                                               angle);
+                                               angle,
+                                               vMax);
     cudaThreadSynchronize();
-
-
-
+    
 
 }
 
@@ -148,6 +158,7 @@ void FlockSystem::clear()
 {
     d_pos.clear();
     d_v.clear();
+    d_vMax.clear();
     d_target.clear();
     d_col.clear();
     d_angle.clear();
@@ -177,35 +188,44 @@ void FlockSystem::prepareBoids(const float &_nBoids,
     std::random_device rd;
     std::mt19937_64 gen(rd());
 
-    float rad = length(diff);
+    float rad = length(halfDiff);
     std::uniform_real_distribution<float> spawnDis(-rad, rad);
 
     std::uniform_real_distribution<float> vDis(-1.0f, 1.0f);
-    //std::uniform_real_distribution<float> vMaxDis(1.0f, 10.0f);
+    std::uniform_real_distribution<float> vMaxDis(1.0f, 10.0f);
+
+
 
     std::vector<float3> posHost;
     std::vector<float3> vHost;
+    std::vector<float> vMaxHost;
+
     float3 pos;
     float3 v;
     for(unsigned int i = 0; i < _nBoids; ++i)
     {
         pos = mid + make_float3(spawnDis(gen),spawnDis(gen), 0.0f);
 
-        std::cout<< pos.x<<", "<< pos.y<< ", "<< pos.z<<'\n';
+        //std::cout<< pos.x<<", "<< pos.y<< ", "<< pos.z<<'\n';
         v = make_float3(vDis(gen), vDis(gen), 0.0f);
         posHost.push_back(pos);
         vHost.push_back(v);
+        vMaxHost.push_back(vMaxDis(gen));
     }
     /// copy pos and velocity results to device vector
     thrust::copy(posHost.begin(),posHost.end(),d_pos.begin());
     thrust::copy(vHost.begin(),vHost.end(),d_v.begin());
+    thrust::copy(vMaxHost.begin(),vMaxHost.end(),d_vMax.begin());
 
 
 
 }
 void FlockSystem::exportResult(std::vector<float3> &_posh, std::vector<float3> &_colh) const
 {
-    //std::cout<< "finished" << '\n';
+
+
+
+
     thrust::copy(d_col.begin(), d_col.end(), _colh.begin());
     thrust::copy(d_pos.begin(), d_pos.end(), _posh.begin());
 

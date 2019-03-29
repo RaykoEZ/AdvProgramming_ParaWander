@@ -6,8 +6,17 @@
 
 __global__ void computeAvgNeighbourPos(bool *_collision, float3 *_target, const float3 *_pos, const uint *_cellOcc, const uint *_scatterAddress);
 
-__global__ void genericBehaviour(float3 *_v, float3 *_col, float3 *_target, float3 *_pos, const bool *_collision, const uint *_cellOcc, const uint *_scatterAddress, const float *_angle);
+__global__ void genericBehaviour(
+    float3 *_v, 
+    float3 *_col, 
+    float3 *_target, 
+    float3 *_pos, 
+    const bool *_collision, 
+    const uint *_cellOcc, 
+    const uint *_scatterAddress, 
+    const float *_angle, 
+    const float * _vMax);
 
-__device__ void resolveForce(float3 &_pos, float3 &_v, const float3 &_f);
+__device__ void resolveForce(float3 &_pos, float3 &_v, const float3 &_f, const float &_vMax);
 
 #endif // FLOCKKERNELS_CUH
