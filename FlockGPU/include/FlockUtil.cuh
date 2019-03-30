@@ -13,4 +13,7 @@ __device__ float dist2(const float3 &_pos1, const float3 &_pos2);
 
 /// returns a vector rotated in the z-axis, angle param in radians 
 __device__ float3 rotateZ(const float3 &_v, const float &_angle);
+
+
+
 #endif // FLOCKUTIL_CUH

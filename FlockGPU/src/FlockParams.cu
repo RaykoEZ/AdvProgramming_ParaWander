@@ -15,7 +15,7 @@ FlockParams::FlockParams(const unsigned int &_numB,
     setVMax(_vMax);
     setTimeStep(_dt);
     setRes(_res);
-    init();
+    
 }
 
 void FlockParams::init()
@@ -68,4 +68,9 @@ void FlockParams::setRes(const unsigned int &_res)
     m_data.m_invRes = 1.0f/_res;
     m_data.m_invRes2 = m_data.m_invRes * m_data.m_invRes;
 
+}
+
+void FlockParams::setCollisionRad(const float &_rad)
+{ 
+    m_data.m_collisionRad = _rad;
 }

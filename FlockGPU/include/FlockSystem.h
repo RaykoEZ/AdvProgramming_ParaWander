@@ -32,6 +32,7 @@ protected:
                       const float &_maxX, const float &_maxY);
     /// Keep track of whether the simulation is ready to start
     bool h_init;
+    uint h_frameCount;
     float h_spawnRad;
 
     ///

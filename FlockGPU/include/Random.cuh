@@ -2,7 +2,7 @@
 #define RANDOM_CUH
 
 /// outputs normalised to be between 0 and 1, simple use case of curandGenerateUniform
-void randomFloats(float *&_out, const size_t _n);
+void randomFloats(float *&_out, const size_t _n, const uint &_seed);
 
 
 #endif // RANDOM_CUH

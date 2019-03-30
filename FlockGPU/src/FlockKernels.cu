@@ -14,10 +14,12 @@ __global__ void computeAvgNeighbourPos(
     uint numNeighbour = 0;
     float3 sumPos = make_float3(0.0f,0.0f,0.0f);
     /// 
-    if (threadIdx.x < _cellOcc[gridCellIdx])
+    if (threadIdx.x <_cellOcc[gridCellIdx])
     {
         uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
         float3 thisPoint = _pos[thisBoidIdx];
+        // set collision flag to false here
+        _collision[thisBoidIdx] = false;
 
         int threadInBlockIdx;
         uint otherCellIdx;
@@ -37,10 +39,11 @@ __global__ void computeAvgNeighbourPos(
                     // Determine the index of the neighbouring point in that cell
                     otherBoidIdx = _scatterAddress[otherCellIdx] + threadInBlockIdx;
                     float d2 = dist2(thisPoint, _pos[otherBoidIdx]);
-                    if ((otherBoidIdx != thisBoidIdx) && (d2 <= paramData.m_invRes))
+                    if ((otherBoidIdx != thisBoidIdx) && (d2 <= paramData.m_collisionRad))
                     {
                          /// sum position to prepare for average position
-                        sumPos += _pos[otherBoidIdx];
+                         _collision[thisBoidIdx] = true;
+                        sumPos = make_float3(sumPos.x + _pos[otherBoidIdx].x,sumPos.y + _pos[otherBoidIdx].y,0.0f);
                         ++numNeighbour;
                     }          
                 }
@@ -50,7 +53,12 @@ __global__ void computeAvgNeighbourPos(
         {
             /// set average position
             _collision[thisBoidIdx] = true;
-            _target[thisBoidIdx] = sumPos / numNeighbour;
+            _target[thisBoidIdx] = make_float3(sumPos.x / numNeighbour, sumPos.y / numNeighbour,0.0f);
+        }
+        else
+        {
+
+            _collision[thisBoidIdx] = false;
         }
     }
 }
@@ -60,7 +68,7 @@ __global__ void genericBehaviour(
     float3 *_col, 
     float3 *_target, 
     float3 *_pos, 
-    const bool *_collision, 
+    bool *_collision, 
     const uint *_cellOcc, 
     const uint *_scatterAddress,
     const float *_angle,
@@ -68,7 +76,6 @@ __global__ void genericBehaviour(
 {
 
     uint gridCellIdx = cellFromGrid(blockIdx);
-    //float3 f;
     ///
 
     if (threadIdx.x < _cellOcc[gridCellIdx])
@@ -76,7 +83,7 @@ __global__ void genericBehaviour(
         uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
         float3 thisPos = _pos[thisBoidIdx];
         float3 thisV = _v[thisBoidIdx];
-        float3 f;
+        float3 f = make_float3(0.0f,0.0f,0.0f);
         float3 thisTarget = _target[thisBoidIdx];
         float thisAng = _angle[thisBoidIdx];
         float thisVMax = _vMax[thisBoidIdx];
@@ -85,7 +92,8 @@ __global__ void genericBehaviour(
         {
             f = boidFleePattern(thisPos,
                                 thisV,
-                                thisTarget);
+                                thisTarget,
+                                thisVMax);
 
             _col[thisBoidIdx] = make_float3(255.0f,0.0f,0.0f);
 
@@ -93,7 +101,6 @@ __global__ void genericBehaviour(
         else
         {
             _target[thisBoidIdx] = boidWanderPattern(
-                        thisTarget,
                         thisAng,
                         thisV,
                         thisPos);
@@ -101,15 +108,24 @@ __global__ void genericBehaviour(
             f = boidSeekPattern(
                         thisPos,
                         thisV,
-                        thisTarget);
+                        thisTarget,
+                        thisVMax);
 
             _col[thisBoidIdx] = make_float3(0.0f,255.0f,0.0f);
 
         }
 
-        resolveForce(thisPos, thisV, f,thisVMax);
+
+        resolveForce(thisPos,thisV,f,thisVMax);
+
         _pos[thisBoidIdx] = thisPos;
         _v[thisBoidIdx] = thisV;
+
+    }
+    else
+    {
+        uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
+        _col[thisBoidIdx] = make_float3(0.0f,0.0f,0.0f);
     }
 }
 
@@ -119,21 +135,22 @@ __device__ void resolveForce(
     const float3 &_f,
     const float &_vMax)
 {
+   
 
-    float3 accel = _f * paramData.m_invMass;
-    float3 oldV = _v + accel;
+    float3 accel = make_float3(_f.x * paramData.m_invMass,_f.y * paramData.m_invMass,0.0f);
+    float3 oldV = make_float3(_v.x + accel.x,_v.y + accel.y,0.0f);
 
     if(length(_v) > 0.0f)
     {
-
-         _v = clamp(oldV,
-              make_float3(-_vMax,-_vMax,0.0f),
-              make_float3(_vMax,_vMax,0.0f));
-         _v = normalize(_v);
+        _v = clamp(oldV,
+                make_float3(-_vMax,-_vMax,0.0f),
+                make_float3(_vMax,_vMax,0.0f));
+        _v = normalize(_v);
 
     }
-    _pos += _v * paramData.m_dt;
+    
+    float3 pos = make_float3(_pos.x +_v.x * paramData.m_dt ,_pos.y + _v.y * paramData.m_dt, 0.0f);
 
-
+    _pos = pos;
 
 }

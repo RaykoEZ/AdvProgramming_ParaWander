@@ -11,7 +11,7 @@ __global__ void genericBehaviour(
     float3 *_col, 
     float3 *_target, 
     float3 *_pos, 
-    const bool *_collision, 
+    bool *_collision, 
     const uint *_cellOcc, 
     const uint *_scatterAddress, 
     const float *_angle, 

@@ -11,7 +11,7 @@ struct FlockData
     unsigned int m_res2;
     float m_invRes;
     float m_invRes2;
-
+    float m_collisionRad;
 
     float m_mass;
     float m_invMass;
@@ -56,6 +56,9 @@ public:
 
     float getTimeStep() const { return m_data.m_dt;}
 
+    float getCollisionRad() const {return m_data.m_collisionRad;}
+
+
     /// Recalculates res2 and their inversions
     void setRes(const unsigned int &_res);
 
@@ -69,6 +72,7 @@ public:
 
     void setTimeStep(const float &_dt);
 
+    void setCollisionRad(const float &_rad);
 protected:
 
     FlockData m_data;

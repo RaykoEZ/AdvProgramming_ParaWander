@@ -23,8 +23,8 @@ __device__ uint cellFromGrid(const uint3 grid)
 __device__ uint cellFromGrid(const int3 grid)
 {
     // Test to see if all of the points are inside the grid (I don't think CUDA can do lazy evaluation (?))
-    bool isInside = (grid.x >= 0) && (grid.x < paramData.m_res) &&
-                    (grid.y >= 0) && (grid.y < paramData.m_res);
+    bool isInside = (grid.x >= 0) && (grid.x <= paramData.m_res) &&
+                    (grid.y >= 0) && (grid.y <= paramData.m_res);
 
     // Write out the hash value if the point is within range [0,1], else write NULL_HASH
     return (isInside) ? cellFromGrid(make_uint3(grid.x, grid.y, 0)) : NULL_HASH;
@@ -40,7 +40,7 @@ __device__ uint3 gridFromCell(const uint cell)
 }
 __device__ float dist2(const float3 &_pos1, const float3 &_pos2)
 {
-    float3 diff = _pos1 - _pos2;
+    float3 diff = make_float3(_pos1.x - _pos2.x,_pos1.y - _pos2.y,0.0f);
     return dot(diff, diff);
 }
 
@@ -52,8 +52,9 @@ __device__ float3 rotateZ(const float3 &_v, const float &_angle)
     float Cos = (cosf(_angle));
     float Sin = (sinf(_angle));
 
-    res.x = _v.x * Cos - _v.y * Sin;
-    res.y = _v.x * Sin + _v.y * Cos;
+    res.x = (_v.x * Cos) - (_v.y * Sin);
+    res.y = (_v.x * Sin) + (_v.y * Cos);
     return res;
 
 }
+

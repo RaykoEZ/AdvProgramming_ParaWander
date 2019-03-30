@@ -123,12 +123,12 @@ int main(int argc, char** argv)
 
     float dt = 0.05f;
     unsigned int n = 100;
-    unsigned int nframes = 1000;
+    unsigned int nframes = 1;
     /// CPU VERSION of Flocking Sim
     ///
     // make our world
-    /*
-    World world = World(300,200.0f,glm::vec3(0.0f));
+/*
+    World world = World(n,500.0f,glm::vec3(0.0f));
     BoidData data;
     for(unsigned int i = 0; i < nframes; ++i)
     {
@@ -137,8 +137,8 @@ int main(int argc, char** argv)
         //std::cout << "pos ="<<data.m_pos[0].x<<','<<data.m_pos[0].y << '\n';
         dumpToGeo(data.m_pos,data.m_col,i);
     }
+*/
 
-    */
     /// GPU VERSION
     ///
 
@@ -154,10 +154,12 @@ int main(int argc, char** argv)
     for(unsigned int i = 0; i < nframes; ++i)
     {
         std::cout << "Timestep="<<dt * float(i+1) << "\n";
+        dumpToGeo(pos,col,i);
+
         flockSys.tick();
         flockSys.exportResult(pos,col);
-        std::cout<< "Pos size , ColSize :"<< pos.size()<<", "<< col.size()<< '\n';
-        dumpToGeo(pos,col,i);
+
+        //std::cout<< "Pos size , ColSize :"<< pos.size()<<", "<< col.size()<< '\n';
     }
     /*
     for(unsigned int i=0;i<n;++i)

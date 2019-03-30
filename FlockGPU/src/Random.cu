@@ -2,13 +2,14 @@
 #include <cuda.h>
 #include <curand.h>
 
-void randomFloats(float *&_out, const size_t _n)
+void randomFloats(float * &_out, const size_t _n, const uint &_seed)
 {
     curandGenerator_t rng;
 
-    curandCreateGenerator(&rng, CURAND_RNG_PSEUDO_DEFAULT);
+    curandCreateGenerator(&rng, CURAND_RNG_PSEUDO_MT19937);
 
-    curandSetPseudoRandomGeneratorSeed(rng, time(NULL));
+    int seed = time(NULL)+ _seed;
+    curandSetPseudoRandomGeneratorSeed(rng, seed);
 
     curandGenerateUniform(rng, _out ,_n);
 

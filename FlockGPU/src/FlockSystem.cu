@@ -25,6 +25,7 @@ FlockSystem::FlockSystem(const uint &_numP, const float &_m, const float &_vMax,
     h_params->setVMax(_vMax);
     h_params->setTimeStep(_dt);
     h_spawnRad = _rad;
+    h_frameCount = 0;
     h_init = false;
     
 
@@ -33,13 +34,14 @@ FlockSystem::FlockSystem(const uint &_numP, const float &_m, const float &_vMax,
 FlockSystem::~FlockSystem()
 {
     clear();
+    h_frameCount = 0;
     delete h_params;
 }
 
 void FlockSystem::init()
 {
     clear();
-    h_params->init();
+    //h_params->init();
     /// reserve vectors for future storage
     d_pos.resize(h_params->getNumBoids());
     d_v.resize(h_params->getNumBoids());
@@ -52,7 +54,6 @@ void FlockSystem::init()
     d_cellOcc.resize(h_params->getRes2(),0);
     d_scatterAddress.resize(h_params->getRes2());
     d_isThereCollision.resize(h_params->getNumBoids());
-
 
     thrust::fill(d_col.begin(), d_col.end(),make_float3(0.0f,255.0f,0.0f));
     thrust::fill(d_isThereCollision.begin(), d_isThereCollision.end(),false);
@@ -68,7 +69,7 @@ void FlockSystem::init()
             std::cerr << "Thrust allocation failed, error " << cudaGetErrorString(err) << "\n";
             exit(0);
     }
-
+    h_params->init();
     h_init = true;
 }
 
@@ -92,14 +93,14 @@ void FlockSystem::tick()
     uint * cellOcc = thrust::raw_pointer_cast(&d_cellOcc[0]);
     uint * scatter = thrust::raw_pointer_cast(&d_scatterAddress[0]);
 
-    /// Set random floats for boid wandering search angle
-    randomFloats(angle, h_params->getNumBoids());
+
     /// flush prior occupancy out and put new occupancy data in
     thrust::fill(d_cellOcc.begin(), d_cellOcc.end(), 0);
     PointHashOperator hashOp(cellOcc);
     thrust::transform(d_pos.begin(), d_pos.end(), d_hash.begin(), hashOp);
 
-
+    /// Set random floats for boid wandering search angle
+    randomFloats(angle, h_params->getNumBoids(),h_frameCount);
 
 
     thrust::sort_by_key(
@@ -150,8 +151,7 @@ void FlockSystem::tick()
                                                angle,
                                                vMax);
     cudaThreadSynchronize();
-    
-
+    ++h_frameCount;
 }
 
 void FlockSystem::clear()
@@ -182,14 +182,17 @@ void FlockSystem::prepareBoids(const float &_nBoids,
 
     float3 diff = maxCorner - minCorner;
     float3 halfDiff = 0.5f * diff;
-    float3 mid = minCorner + halfDiff;
+    float3 mid = make_float3(minCorner.x + halfDiff.x,minCorner.y + halfDiff.y,0.0f);
 
 
     std::random_device rd;
     std::mt19937_64 gen(rd());
 
-    float rad = length(halfDiff);
-    std::uniform_real_distribution<float> spawnDis(-rad, rad);
+    float3 quartDiff = 0.5f* halfDiff;
+    float rad = length(quartDiff);
+    float boidRad =0.5f * h_params->getInvRes();
+    h_params->setCollisionRad(boidRad);
+    std::uniform_real_distribution<float> spawnDis(0.1f, 0.9f);
 
     std::uniform_real_distribution<float> vDis(-1.0f, 1.0f);
     std::uniform_real_distribution<float> vMaxDis(1.0f, 10.0f);
@@ -204,7 +207,7 @@ void FlockSystem::prepareBoids(const float &_nBoids,
     float3 v;
     for(unsigned int i = 0; i < _nBoids; ++i)
     {
-        pos = mid + make_float3(spawnDis(gen),spawnDis(gen), 0.0f);
+        pos = make_float3(spawnDis(gen),spawnDis(gen), 0.0f);
 
         //std::cout<< pos.x<<", "<< pos.y<< ", "<< pos.z<<'\n';
         v = make_float3(vDis(gen), vDis(gen), 0.0f);
@@ -222,11 +225,53 @@ void FlockSystem::prepareBoids(const float &_nBoids,
 }
 void FlockSystem::exportResult(std::vector<float3> &_posh, std::vector<float3> &_colh) const
 {
-
-
-
-
     thrust::copy(d_col.begin(), d_col.end(), _colh.begin());
     thrust::copy(d_pos.begin(), d_pos.end(), _posh.begin());
+
+
+    std::vector<float3> vh;
+    vh.resize(h_params->getNumBoids());
+    std::vector<float3> targeth;
+    targeth.resize(h_params->getNumBoids());
+    thrust::copy(d_v.begin(), d_v.end(),vh.begin());
+    thrust::copy(d_target.begin(), d_target.end(),targeth.begin());
+
+    //std::vector<bool> collisionh;
+    //std::vector<float> angleh;
+    std::vector<uint> occh;
+    occh.resize(h_params->getRes2());
+    //angleh.resize(h_params->getNumBoids());
+    //collisionh.resize(h_params->getNumBoids());
+    thrust::copy(d_cellOcc.begin(), d_cellOcc.end(),occh.begin());
+    //thrust::copy(d_isThereCollision.begin(), d_isThereCollision.end(),collisionh.begin());
+    //thrust::copy(d_angle.begin(), d_angle.end(),angleh.begin());
+    //std::cout<<"Num of Cells allocated: "<< h_params->getRes2() << '\n';
+    uint size = h_params->getNumBoids();
+    
+    for(int i = 0; i< size;++i)
+    {
+        //std::cout<< "Collision check: "<< collisionh[i] << '\n';
+
+
+        //std::cout<<"Angle Check: " << angleh[i] * 360.0f <<'\n';
+        std::cout<<"Pos Check: "<< _posh[i].x << ", " << _posh[i].y<< '\n';
+        std::cout<<"V Check: "<< vh[i].x << ", " << vh[i].y<< '\n';
+        std::cout<<"Target Check: "<< targeth[i].x << ", " << targeth[i].y<< '\n';
+
+    }
+    /*
+    for(int i = 0; i< h_params->getRes2();++i)
+    {
+        if(occh[i] > 0)
+        {
+
+            std::cout<< "Occupancy check: "<< occh[i] << '\n';
+
+        }
+        
+    }
+    */
+
+
 
 }
