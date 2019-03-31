@@ -63,12 +63,7 @@ void FlockSystem::init()
                                           0.9f,0.9f);
 
 
-    cudaError_t err = cudaGetLastError();
-        if (err != cudaSuccess)
-        {
-            std::cerr << "Thrust allocation failed, error " << cudaGetErrorString(err) << "\n";
-            exit(0);
-    }
+    cudaErrorPrint();
     h_params->init();
     h_init = true;
 }
@@ -101,7 +96,7 @@ void FlockSystem::tick()
 
     /// Set random floats for boid wandering search angle
     randomFloats(angle, h_params->getNumBoids(),h_frameCount);
-
+    cudaErrorPrint();
 
     thrust::sort_by_key(
     d_hash.begin(),
@@ -114,8 +109,9 @@ void FlockSystem::tick()
                                                  d_col.begin(),
                                                  d_vMax.begin()
                                                  )));
-
+    cudaErrorPrint();
     thrust::exclusive_scan(d_cellOcc.begin(), d_cellOcc.end(), d_scatterAddress.begin());
+    cudaErrorPrint();
     uint maxCellOcc = thrust::reduce(d_cellOcc.begin(), d_cellOcc.end(), 0, thrust::maximum<unsigned int>());
 
     /// define block dims to solve for ths frame
@@ -139,6 +135,8 @@ void FlockSystem::tick()
 
     computeAvgNeighbourPos<<<gridSize, blockSize>>>(collision, targetPos, pos, cellOcc, scatter);
     cudaThreadSynchronize();
+
+    cudaErrorPrint();
     /// now we decide to wander if no collision, flee if there is collision
     genericBehaviour<<<gridSize,blockSize>>>(
                                                velocity,
@@ -151,6 +149,7 @@ void FlockSystem::tick()
                                                angle,
                                                vMax);
     cudaThreadSynchronize();
+    cudaErrorPrint();
     ++h_frameCount;
 }
 
