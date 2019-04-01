@@ -36,8 +36,9 @@ __device__ uint PointHashOperator::operator()(const float3 &_pos)
     if (hash != NULL_HASH)
     {
         atomicAdd(&m_cellOcc[hash], 1);
+        
     }
 
     // Return the cell idx (NULL_HASH if out of bounds)
-    return 0; //hash;
+    return hash; //hash;
 }

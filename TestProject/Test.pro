@@ -21,6 +21,8 @@ unix:{
 # link with my libraries
 LIBS+= -L"../FlockCPU" -lFlockCPU
 LIBS+= -L"../FlockGPU" -lFlockGPU
+QMAKE_RPATHDIR += ../FlockGPU
+QMAKE_RPATHDIR += ../FlockCPU
 # where our exe is going to live (root of project)
 DESTDIR=./
 win32:{

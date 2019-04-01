@@ -14,7 +14,7 @@ __global__ void computeAvgNeighbourPos(
     uint numNeighbour = 0;
     float3 sumPos = make_float3(0.0f,0.0f,0.0f);
     /// 
-    if (threadIdx.x <_cellOcc[gridCellIdx])
+    if (threadIdx.x < _cellOcc[gridCellIdx])
     {
         uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
         float3 thisPoint = _pos[thisBoidIdx];
@@ -39,7 +39,7 @@ __global__ void computeAvgNeighbourPos(
                     // Determine the index of the neighbouring point in that cell
                     otherBoidIdx = _scatterAddress[otherCellIdx] + threadInBlockIdx;
                     float d2 = dist2(thisPoint, _pos[otherBoidIdx]);
-                    if ((otherBoidIdx != thisBoidIdx) && (d2 <= paramData.m_collisionRad))
+                    if ((otherBoidIdx != thisBoidIdx) && (d2 <= paramData.m_invRes2))
                     {
                          /// sum position to prepare for average position
                          _collision[thisBoidIdx] = true;
@@ -54,11 +54,6 @@ __global__ void computeAvgNeighbourPos(
             /// set average position
             _collision[thisBoidIdx] = true;
             _target[thisBoidIdx] = make_float3(sumPos.x / numNeighbour, sumPos.y / numNeighbour,0.0f);
-        }
-        else
-        {
-
-            _collision[thisBoidIdx] = false;
         }
     }
 }
@@ -77,10 +72,11 @@ __global__ void genericBehaviour(
 
     uint gridCellIdx = cellFromGrid(blockIdx);
     ///
+    uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
 
     if (threadIdx.x < _cellOcc[gridCellIdx])
     {       
-        uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
+
         float3 thisPos = _pos[thisBoidIdx];
         float3 thisV = _v[thisBoidIdx];
         float3 f = make_float3(0.0f,0.0f,0.0f);
@@ -122,11 +118,7 @@ __global__ void genericBehaviour(
         _v[thisBoidIdx] = thisV;
 
     }
-    else
-    {
-        uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
-        _col[thisBoidIdx] = make_float3(0.0f,0.0f,0.0f);
-    }
+
 }
 
 __device__ void resolveForce(

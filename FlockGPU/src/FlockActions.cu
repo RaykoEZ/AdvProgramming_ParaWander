@@ -11,7 +11,7 @@ __device__ float3 boidWanderPattern(
 {
 
     /// get boid's random angle for rotation
-    float thisAngle = (_angle * 360.0f * CUDART_RADIAN_F) - CUDART_PI_F;
+    float thisAngle = (_angle * 360.0f * CUDART_RADIAN_F);
     /// get a future direction and randomly generate possible future directions
     float3 future = make_float3(_pos.x + 10.0f*_v.x, _pos.y + 10.0f*_v.y,0.0f); 
     /// set boid target position to a random rotated direction from a position ahead of the boid

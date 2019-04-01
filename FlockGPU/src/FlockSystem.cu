@@ -1,5 +1,6 @@
 #include "FlockSystem.h"
 #include "Hash.cuh"
+#include "DebugUtil.cuh"
 #include <random>
 #include <iostream>
 #include "FlockParams.cuh"
@@ -42,7 +43,7 @@ void FlockSystem::init()
 {
     clear();
     //h_params->init();
-    /// reserve vectors for future storage
+    /// resize vectors for future storage
     d_pos.resize(h_params->getNumBoids());
     d_v.resize(h_params->getNumBoids());
     d_vMax.resize(h_params->getNumBoids());
@@ -63,9 +64,10 @@ void FlockSystem::init()
                                           0.9f,0.9f);
 
 
-    cudaErrorPrint();
+
+
+    //cudaErrorPrint();
     h_params->init();
-    h_init = true;
 }
 
 
@@ -88,15 +90,17 @@ void FlockSystem::tick()
     uint * cellOcc = thrust::raw_pointer_cast(&d_cellOcc[0]);
     uint * scatter = thrust::raw_pointer_cast(&d_scatterAddress[0]);
 
-
+    /// Set random floats for boid wandering search angle
+    randomFloats(angle, h_params->getNumBoids(),h_frameCount);
     /// flush prior occupancy out and put new occupancy data in
     thrust::fill(d_cellOcc.begin(), d_cellOcc.end(), 0);
     PointHashOperator hashOp(cellOcc);
     thrust::transform(d_pos.begin(), d_pos.end(), d_hash.begin(), hashOp);
 
-    /// Set random floats for boid wandering search angle
-    randomFloats(angle, h_params->getNumBoids(),h_frameCount);
-    cudaErrorPrint();
+
+
+
+    //cudaErrorPrint();
 
     thrust::sort_by_key(
     d_hash.begin(),
@@ -105,18 +109,26 @@ void FlockSystem::tick()
                                                  d_v.begin(),
                                                  d_target.begin(),
                                                  d_angle.begin(),
-                                                 d_isThereCollision.begin(),
-                                                 d_col.begin(),
                                                  d_vMax.begin()
-                                                 )));
-    cudaErrorPrint();
+    )));
+                    
+
+
+
+    //cudaErrorPrint();
     thrust::exclusive_scan(d_cellOcc.begin(), d_cellOcc.end(), d_scatterAddress.begin());
-    cudaErrorPrint();
+    //cudaErrorPrint();
     uint maxCellOcc = thrust::reduce(d_cellOcc.begin(), d_cellOcc.end(), 0, thrust::maximum<unsigned int>());
 
     /// define block dims to solve for ths frame
     uint blockSize = 32 * ceil(maxCellOcc / 32.0f);
     dim3 gridSize(h_params->getRes(), h_params->getRes());
+    //std::cout<<"Res dump: "<< h_params->getRes()<<'\n';
+    //d_threadIdxCheck.resize(blockSize);
+    //d_blockIdxCheck.resize(h_params->getRes2());
+
+    //uint * thread = thrust::raw_pointer_cast(&d_threadIdxCheck[0]);
+    //uint * block = thrust::raw_pointer_cast(&d_blockIdxCheck[0]);
     /// We update boids in gpu below
 
     /// Spatial hash values, cell occupancy, memory scatter offset ( scatter addresses),
@@ -136,7 +148,7 @@ void FlockSystem::tick()
     computeAvgNeighbourPos<<<gridSize, blockSize>>>(collision, targetPos, pos, cellOcc, scatter);
     cudaThreadSynchronize();
 
-    cudaErrorPrint();
+    //cudaErrorPrint();
     /// now we decide to wander if no collision, flee if there is collision
     genericBehaviour<<<gridSize,blockSize>>>(
                                                velocity,
@@ -149,7 +161,8 @@ void FlockSystem::tick()
                                                angle,
                                                vMax);
     cudaThreadSynchronize();
-    cudaErrorPrint();
+
+    //cudaErrorPrint();
     ++h_frameCount;
 }
 
@@ -165,6 +178,9 @@ void FlockSystem::clear()
     d_hash.clear();
     d_cellOcc.clear();
     d_scatterAddress.clear();
+    
+    //d_threadIdxCheck.clear();
+    //d_blockIdxCheck.clear();
 
 
 }
@@ -219,6 +235,7 @@ void FlockSystem::prepareBoids(const float &_nBoids,
     thrust::copy(vHost.begin(),vHost.end(),d_v.begin());
     thrust::copy(vMaxHost.begin(),vMaxHost.end(),d_vMax.begin());
 
+    h_init = true;
 
 
 }
@@ -227,49 +244,65 @@ void FlockSystem::exportResult(std::vector<float3> &_posh, std::vector<float3> &
     thrust::copy(d_col.begin(), d_col.end(), _colh.begin());
     thrust::copy(d_pos.begin(), d_pos.end(), _posh.begin());
 
-
-    std::vector<float3> vh;
-    vh.resize(h_params->getNumBoids());
-    std::vector<float3> targeth;
-    targeth.resize(h_params->getNumBoids());
-    thrust::copy(d_v.begin(), d_v.end(),vh.begin());
-    thrust::copy(d_target.begin(), d_target.end(),targeth.begin());
+    
+    //std::vector<uint> hashH;
+    //hashH.resize(h_params->getNumBoids());
+    //thrust::copy(d_hash.begin(),d_hash.end(), hashH.begin());
+    //std::vector<float3> vh;
+    //vh.resize(h_params->getNumBoids());
+    //std::vector<float3> targeth;
+    //targeth.resize(h_params->getNumBoids());
+    //thrust::copy(d_v.begin(), d_v.end(),vh.begin());
+    //thrust::copy(d_target.begin(), d_target.end(),targeth.begin());
 
     //std::vector<bool> collisionh;
     //std::vector<float> angleh;
-    std::vector<uint> occh;
-    occh.resize(h_params->getRes2());
+    //std::vector<uint> occh;
+    //occh.resize(h_params->getRes2());
     //angleh.resize(h_params->getNumBoids());
     //collisionh.resize(h_params->getNumBoids());
-    thrust::copy(d_cellOcc.begin(), d_cellOcc.end(),occh.begin());
+    //thrust::copy(d_cellOcc.begin(), d_cellOcc.end(),occh.begin());
     //thrust::copy(d_isThereCollision.begin(), d_isThereCollision.end(),collisionh.begin());
     //thrust::copy(d_angle.begin(), d_angle.end(),angleh.begin());
     //std::cout<<"Num of Cells allocated: "<< h_params->getRes2() << '\n';
-    uint size = h_params->getNumBoids();
+    //uint size = h_params->getNumBoids();
     
-    for(int i = 0; i< size;++i)
-    {
+    //for(int i = 0; i< size;++i)
+    //{
         //std::cout<< "Collision check: "<< collisionh[i] << '\n';
-
+        //std::cout<< "Hash check: "<< hashH[i] << '\n';
 
         //std::cout<<"Angle Check: " << angleh[i] * 360.0f <<'\n';
-        std::cout<<"Pos Check: "<< _posh[i].x << ", " << _posh[i].y<< '\n';
-        std::cout<<"V Check: "<< vh[i].x << ", " << vh[i].y<< '\n';
-        std::cout<<"Target Check: "<< targeth[i].x << ", " << targeth[i].y<< '\n';
+        //std::cout<<"Pos Check: "<< _posh[i].x << ", " << _posh[i].y<< '\n';
+        //std::cout<<"V Check: "<< vh[i].x << ", " << vh[i].y<< '\n';
+        //std::cout<<"Target Check: "<< targeth[i].x << ", " << targeth[i].y<< '\n';
 
-    }
+    //}
+    
+    //std::vector<uint> threadH;
+    //std::vector<uint> blockH;
+    //threadH.resize(d_threadIdxCheck.size());
+    //blockH.resize(d_blockIdxCheck.size());
+
+    //thrust::copy(d_threadIdxCheck.begin(),d_threadIdxCheck.end(),threadH.begin());
+    //thrust::copy(d_blockIdxCheck.begin(),d_blockIdxCheck.end(),blockH.begin());
+
+    //for(int i = 0; i< threadH.size();++i)
+    //{
+        
+    //    std::cout<< "ThreadIdx check: "<< threadH[i]<<'\n';
+
+        //std::cout<< "Occupancy check: "<< occh[i] << '\n'; 
+    //}
     /*
     for(int i = 0; i< h_params->getRes2();++i)
     {
-        if(occh[i] > 0)
-        {
-
-            std::cout<< "Occupancy check: "<< occh[i] << '\n';
-
-        }
         
-    }
-    */
+        //std::cout<< "BlockIdx check: "<< blockH[i].x << ", "<< blockH[i].y<<", "<<blockH[i].z<<'\n';
+
+        std::cout<< "Occupancy check in blocks: "<< blockH[i] << '\n'; 
+    }*/
+    
 
 
 

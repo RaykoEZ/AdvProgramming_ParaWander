@@ -48,6 +48,9 @@ protected:
     thrust::device_vector<float> d_vMax;
     thrust::device_vector<float3> d_target;
 
+    //thrust::device_vector<uint> d_threadIdxCheck;
+    //thrust::device_vector<uint> d_blockIdxCheck;
+
 
 
 
