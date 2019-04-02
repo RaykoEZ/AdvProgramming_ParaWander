@@ -13,7 +13,7 @@ void dumpToGeo(const std::vector<glm::vec3> &points,
                const std::vector<glm::vec3> &colour,
                const unsigned int cnt) {
     char fname[100];
-    std::sprintf(fname,"geo/sph.%04d.geo", cnt);
+    std::sprintf(fname,"geo/flock.%04d.geo", cnt);
 
     // we will use a stringstream as it may be more efficient
     std::stringstream ss;
@@ -67,7 +67,7 @@ void dumpToGeo(const std::vector<float3> &points,
                const std::vector<float3> &colour,
                const unsigned int cnt) {
     char fname[100];
-    std::sprintf(fname,"geo/sph.%04d.geo", cnt);
+    std::sprintf(fname,"geo/flock.%04d.geo", cnt);
 
     // we will use a stringstream as it may be more efficient
     std::stringstream ss;
@@ -122,18 +122,23 @@ int main(int argc, char** argv)
 {
 
     float dt = 0.001f;
-    unsigned int n = 50;
-    unsigned int nframes = 200;
+    unsigned int n = 10000;
+    unsigned int nframes = 300;
     /// CPU VERSION of Flocking Sim
     ///
-    // make our world
+    ///
 /*
-    World world = World(n,500.0f,glm::vec3(0.0f));
+    /// dt is higher on CPU due to the implementation using global world space whereas device is contained in a [0,1] region
+    float dtH = 0.5f;
+    // make our world
+
+
+    World world = World(n,1000.0f,glm::vec3(0.0f));
     BoidData data;
     for(unsigned int i = 0; i < nframes; ++i)
     {
-        std::cout << "Timestep="<<dt * float(i+1) << "\n";
-        data = world.tick(dt);
+        std::cout << "Timestep="<<dtH * float(i+1) << "\n";
+        data = world.tick(dtH);
         //std::cout << "pos ="<<data.m_pos[0].x<<','<<data.m_pos[0].y << '\n';
         dumpToGeo(data.m_pos,data.m_col,i);
     }
@@ -142,7 +147,7 @@ int main(int argc, char** argv)
     /// GPU VERSION
     ///
 
-    float res = 32;
+    float res = 4096;
     FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
     flockSys.init();
     std::vector<float3> pos;
@@ -168,8 +173,9 @@ int main(int argc, char** argv)
         std::cout << "Cols = "<<col[i].x << ", "<< col[i].y<< ", " << col[i].z<< "\n";
 
     }
+
     */
     /// Test run
     //testing::InitGoogleTest(&argc, argv);
-    return 0;//RUN_ALL_TESTS();;
+    return 0;//RUN_ALL_TESTS();
 }

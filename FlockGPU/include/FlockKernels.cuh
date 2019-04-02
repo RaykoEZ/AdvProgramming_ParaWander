@@ -14,7 +14,7 @@ __global__ void genericBehaviour(
     bool *_collision, 
     const uint *_cellOcc, 
     const uint *_scatterAddress, 
-    const float *_angle, 
+     float *_angle, 
     const float * _vMax /*, uint * _threadIdx, uint * _blockIdx*/);
 
 __device__ void resolveForce(float3 &_pos, float3 &_v, const float3 &_f, const float &_vMax);

@@ -7,7 +7,7 @@
 
 __device__ float3 boidWanderPattern( const float &_angle, const float3 &_v, const float3 &_pos);
 
-__device__ float3 boidSeekPattern( const float3  &_pos, const float3  &_v, const float3 &_target, const float &_vMax);
+__device__ float3 boidSeekPattern( const float3  &_pos,  float3  &_v, const float3 &_target, const float &_vMax);
 
 __device__ float3 boidFleePattern( const float3  &_pos,  float3  &_v, const float3  &_target, const float &_vMax);
 #endif //FLOCKACTIONS_H

@@ -40,7 +40,7 @@ __device__ uint3 gridFromCell(const uint cell)
 }
 __device__ float dist2(const float3 &_pos1, const float3 &_pos2)
 {
-    float3 diff = make_float3(_pos1.x - _pos2.x,_pos1.y - _pos2.y,0.0f);
+    float3 diff = _pos1 - _pos2;
     return dot(diff, diff);
 }
 
@@ -49,8 +49,8 @@ __device__ float3 rotateZ(const float3 &_v, const float &_angle)
 {
     float3 res = _v;
     
-    float Cos = (cosf(_angle));
-    float Sin = (sinf(_angle));
+    float Cos = cosf(_angle);
+    float Sin = sinf(_angle);
 
     res.x = (_v.x * Cos) - (_v.y * Sin);
     res.y = (_v.x * Sin) + (_v.y * Cos);

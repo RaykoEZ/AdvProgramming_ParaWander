@@ -12,7 +12,6 @@ glm::vec3 FlockFunctions::seek(const glm::vec3 &_pos, const glm::vec3 &_v,const 
         desiredV = glm::normalize(desiredV);
         desiredV *= _vMax;
         desiredV -= _v;
-
         return desiredV;
     }
     //std::cout <<"Reached " <<'\n';
@@ -21,7 +20,7 @@ glm::vec3 FlockFunctions::seek(const glm::vec3 &_pos, const glm::vec3 &_v,const 
 
 }
 
-glm::vec3 FlockFunctions::flee(const glm::vec3 &_pos, const glm::vec3 &_v,const float &_vMax, const glm::vec3 &_target)
+glm::vec3 FlockFunctions::flee(const glm::vec3 &_pos, const glm::vec3 &_v, const float &_vMax, const glm::vec3 &_target)
 {
     /// steer away from the seeking position
 
@@ -31,7 +30,6 @@ glm::vec3 FlockFunctions::flee(const glm::vec3 &_pos, const glm::vec3 &_v,const 
         desiredV = glm::normalize(desiredV);
         desiredV *= _vMax;
         desiredV -= _v;
-        // Draw direction line for debug
 
         return desiredV;
     }
@@ -40,9 +38,9 @@ glm::vec3 FlockFunctions::flee(const glm::vec3 &_pos, const glm::vec3 &_v,const 
 }
 glm::vec3 FlockFunctions::wander(const glm::vec3 &_pos, const glm::vec3 &_v)
 {
-    static std::mt19937_64 m_rng;
-    static std::random_device rd;
-    static std::mt19937_64 gen(rd());
+    std::mt19937_64 m_rng;
+    std::random_device rd;
+    std::mt19937_64 gen(rd());
     m_rng = gen;
 
     std::uniform_real_distribution<float> dis(-180.0f, 180.0f);

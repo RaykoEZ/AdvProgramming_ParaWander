@@ -90,14 +90,14 @@ void FlockSystem::tick()
     uint * cellOcc = thrust::raw_pointer_cast(&d_cellOcc[0]);
     uint * scatter = thrust::raw_pointer_cast(&d_scatterAddress[0]);
 
-    /// Set random floats for boid wandering search angle
-    randomFloats(angle, h_params->getNumBoids(),h_frameCount);
+
     /// flush prior occupancy out and put new occupancy data in
     thrust::fill(d_cellOcc.begin(), d_cellOcc.end(), 0);
     PointHashOperator hashOp(cellOcc);
     thrust::transform(d_pos.begin(), d_pos.end(), d_hash.begin(), hashOp);
 
-
+    /// Set random floats for boid wandering search angle
+    randomFloats(angle, h_params->getNumBoids(),h_frameCount);
 
 
     //cudaErrorPrint();
@@ -143,7 +143,7 @@ void FlockSystem::tick()
     /// - Boid Target Position (to average neighbourhood position)
     ///
 
-    std::cout << "maxCellOcc=" << maxCellOcc << ", blockSize=" << blockSize << ", gridSize=" << h_params->getRes() << "^2\n";
+    //std::cout << "maxCellOcc=" << maxCellOcc << ", blockSize=" << blockSize << ", gridSize=" << h_params->getRes() << "^2\n";
 
     computeAvgNeighbourPos<<<gridSize, blockSize>>>(collision, targetPos, pos, cellOcc, scatter);
     cudaThreadSynchronize();
@@ -266,19 +266,19 @@ void FlockSystem::exportResult(std::vector<float3> &_posh, std::vector<float3> &
     //thrust::copy(d_angle.begin(), d_angle.end(),angleh.begin());
     //std::cout<<"Num of Cells allocated: "<< h_params->getRes2() << '\n';
     //uint size = h_params->getNumBoids();
-    
-    //for(int i = 0; i< size;++i)
-    //{
+    /*
+    for(int i = 0; i< size;++i)
+    {
         //std::cout<< "Collision check: "<< collisionh[i] << '\n';
         //std::cout<< "Hash check: "<< hashH[i] << '\n';
 
-        //std::cout<<"Angle Check: " << angleh[i] * 360.0f <<'\n';
+        //std::cout<<"Angle Check: " << angleh[i] <<'\n';
         //std::cout<<"Pos Check: "<< _posh[i].x << ", " << _posh[i].y<< '\n';
         //std::cout<<"V Check: "<< vh[i].x << ", " << vh[i].y<< '\n';
         //std::cout<<"Target Check: "<< targeth[i].x << ", " << targeth[i].y<< '\n';
 
-    //}
-    
+    }
+    */
     //std::vector<uint> threadH;
     //std::vector<uint> blockH;
     //threadH.resize(d_threadIdxCheck.size());

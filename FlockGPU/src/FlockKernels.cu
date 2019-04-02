@@ -2,6 +2,7 @@
 #include "FlockActions.cuh"
 #include "FlockParams.cuh"
 #include "FlockUtil.cuh"
+#include "DebugUtil.cuh"
 __global__ void computeAvgNeighbourPos(
     bool *_collision, 
     float3 *_target, 
@@ -43,7 +44,7 @@ __global__ void computeAvgNeighbourPos(
                     {
                          /// sum position to prepare for average position
                          _collision[thisBoidIdx] = true;
-                        sumPos = make_float3(sumPos.x + _pos[otherBoidIdx].x,sumPos.y + _pos[otherBoidIdx].y,0.0f);
+                        sumPos = sumPos + _pos[otherBoidIdx];
                         ++numNeighbour;
                     }          
                 }
@@ -52,8 +53,7 @@ __global__ void computeAvgNeighbourPos(
         if(numNeighbour > 0)
         {
             /// set average position
-            _collision[thisBoidIdx] = true;
-            _target[thisBoidIdx] = make_float3(sumPos.x / numNeighbour, sumPos.y / numNeighbour,0.0f);
+            _target[thisBoidIdx] = sumPos / numNeighbour;
         }
     }
 }
@@ -66,29 +66,27 @@ __global__ void genericBehaviour(
     bool *_collision, 
     const uint *_cellOcc, 
     const uint *_scatterAddress,
-    const float *_angle,
+    float *_angle,
     const float * _vMax)
 {
 
     uint gridCellIdx = cellFromGrid(blockIdx);
     ///
-    uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
+ 
 
     if (threadIdx.x < _cellOcc[gridCellIdx])
     {       
-
+        uint thisBoidIdx = _scatterAddress[gridCellIdx] + threadIdx.x;
         float3 thisPos = _pos[thisBoidIdx];
-        float3 thisV = _v[thisBoidIdx];
-        float3 f = make_float3(0.0f,0.0f,0.0f);
-        float3 thisTarget = _target[thisBoidIdx];
+        float3 f;
         float thisAng = _angle[thisBoidIdx];
         float thisVMax = _vMax[thisBoidIdx];
 
         if(_collision[thisBoidIdx])
         {
             f = boidFleePattern(thisPos,
-                                thisV,
-                                thisTarget,
+                                _v[thisBoidIdx],
+                                _target[thisBoidIdx],
                                 thisVMax);
 
             _col[thisBoidIdx] = make_float3(255.0f,0.0f,0.0f);
@@ -98,24 +96,23 @@ __global__ void genericBehaviour(
         {
             _target[thisBoidIdx] = boidWanderPattern(
                         thisAng,
-                        thisV,
+                        _v[thisBoidIdx],
                         thisPos);
 
             f = boidSeekPattern(
                         thisPos,
-                        thisV,
-                        thisTarget,
+                        _v[thisBoidIdx],
+                        _target[thisBoidIdx],
                         thisVMax);
 
             _col[thisBoidIdx] = make_float3(0.0f,255.0f,0.0f);
 
         }
 
+        resolveForce(_pos[thisBoidIdx],_v[thisBoidIdx],f,thisVMax);
 
-        resolveForce(thisPos,thisV,f,thisVMax);
-
-        _pos[thisBoidIdx] = thisPos;
-        _v[thisBoidIdx] = thisV;
+        //_pos[thisBoidIdx] = thisPos;
+        //_v[thisBoidIdx] = thisV;
 
     }
 
@@ -141,8 +138,6 @@ __device__ void resolveForce(
 
     }
     
-    float3 pos = make_float3(_pos.x +_v.x * paramData.m_dt ,_pos.y + _v.y * paramData.m_dt, 0.0f);
-
-    _pos = pos;
+    _pos = _pos + _v*paramData.m_dt;
 
 }

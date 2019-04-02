@@ -58,6 +58,8 @@ void Boid::tick(const float &_dt)
 
     // we resolve our forces here
     glm::vec3 accel = f * m_invMass;
+    // change boid direction, towards the direction of our force
+    m_v = f;
     glm::vec3 oldV = m_v + accel;
     //std::cout <<"oldV: " << oldV.x <<','<< oldV.y<<'\n';
     //std::cout <<"m_v: " << m_v.x <<','<< m_v.y<<'\n';
