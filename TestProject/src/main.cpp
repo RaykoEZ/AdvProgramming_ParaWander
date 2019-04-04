@@ -3,9 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include "World.h"
-#include "UnitTests.h"
-#include "FlockSystem.h"
-
+#include "CPUUnitTests.h"
+#include "GPUUnitTests.h"
 /// Dump our data from the fluid problem to a file
 /// Taken from: https://github.com/NCCA/libfluid/blob/master/test/src/main.cpp
 /// By Richard Southern
@@ -147,7 +146,7 @@ int main(int argc, char** argv)
     /// GPU VERSION
     ///
 
-    float res = 4096;
+    float res = 2048;
     FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
     flockSys.init();
     std::vector<float3> pos;
@@ -162,19 +161,8 @@ int main(int argc, char** argv)
         dumpToGeo(pos,col,i);
         flockSys.tick();
         flockSys.exportResult(pos,col);
-
-        //std::cout<< "Pos size , ColSize :"<< pos.size()<<", "<< col.size()<< '\n';
-    }
-    /*
-    for(unsigned int i=0;i<n;++i)
-    {
-        std::cout << "Pos = "<<pos[i].x << ", "<< pos[i].y<< ", " << pos[i].z<< "\n";
-
-        std::cout << "Cols = "<<col[i].x << ", "<< col[i].y<< ", " << col[i].z<< "\n";
-
     }
 
-    */
     /// Test run
     //testing::InitGoogleTest(&argc, argv);
     return 0;//RUN_ALL_TESTS();
