@@ -32,7 +32,7 @@ win32:
 
 }
 CONFIG += console c++11
-CONFIG-=app_bundle
+#CONFIG-=app_bundle
 # flags taken from Jack Diver's qt setup:
 # https://github.com/nitronoid/flo/blob/master/common.pri
 unix:{
