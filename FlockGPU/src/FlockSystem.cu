@@ -123,9 +123,7 @@ void FlockSystem::tick()
     /// define block dims to solve for ths frame
     uint blockSize = 32 * ceil(maxCellOcc / 32.0f);
     dim3 gridSize(h_params->getRes(), h_params->getRes());
-    //std::cout<<"Res dump: "<< h_params->getRes()<<'\n';
-    //d_threadIdxCheck.resize(blockSize);
-    //d_blockIdxCheck.resize(h_params->getRes2());
+
 
     //uint * thread = thrust::raw_pointer_cast(&d_threadIdxCheck[0]);
     //uint * block = thrust::raw_pointer_cast(&d_blockIdxCheck[0]);

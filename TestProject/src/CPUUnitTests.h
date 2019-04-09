@@ -5,7 +5,8 @@
 #include <vector>
 #include "glm/vec3.hpp"
 /// @file Unit tests are all implemented here:
-namespace CPUUnitTests {
+namespace CPUUnitTests 
+{
 
 
     /// helper function for testing & diagnose value in a range, learnt from :
