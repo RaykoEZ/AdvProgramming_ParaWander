@@ -4,7 +4,7 @@
 #include "World.h"
 #include <vector>
 #include "glm/vec3.hpp"
-/// @file Unit tests are all implemented here:
+/// @file Unit tests for CPU impl are all implemented here:
 namespace CPUUnitTests 
 {
 

@@ -2,6 +2,7 @@
 #define GPUUNITTESTS_H
 #include "gtest/gtest.h"
 #include <vector>
+#include "FlockSystem.h"
 #include "DeviceTestKernels.cuh"
 
 namespace GPUUnitTests
@@ -16,92 +17,94 @@ namespace GPUUnitTests
             return ::testing::AssertionFailure()
                    << _val << " is outside the range " << _min << " to " << _max;
     }  
-
-    namespace ConfigParamTest
-    {
-        /// Testing for valid config parameters for kernels to run
-        TEST(ConfigParamTest, InitializerTest)
-        {
-
-        }
-    }
     
     /// Test for device and global kernels
-    namespace KernelTest
+
+
+    namespace UtilTest
     {
+        float dt = 0.001f;
+        float res = 128.0f;
 
-        TEST(KernelTest, RuntimeTest_Hash)
+        TEST(UtilTest, RuntimeTest_Hash)
         {
+            unsigned int n = 100;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
 
-        }
+            flockSys.init();
+            flockSys.tick();
 
-
-        namespace FlockingTest
-        {
-
-            TEST(FlockingTest, RuntimeTest_Neighbourhood)
-            {
-
-            }
-
-            TEST(FlockingTest, RuntimeTest_Boid_Behaviour)
-            {
-
-
-            }
-
-            TEST(FlockingTest, RuntimeTest_Integrator)
-            {
-
-            }
-
-            TEST(FlockingTest, RuntimeTest_Seek)
-            {
-
-            }
-            TEST(FlockingTest, RuntimeTest_Flee)
-            {
-
-            }
-            TEST(FlockingTest, RuntimeTest_Wander)
-            {
-
-            }
+            std::vector<uint> hash;
+            hash.resize(n);
+            flockSys.exportHashTable(hash);
 
 
 
         }
-
-        namespace UtilTest
+        TEST(UtilTest, RuntimeTest_Grid_From_Pos)
         {
-
-            TEST(UtilTest, RuntimeTest_Grid_From_Pos)
-            {
-
-
-            }
-            TEST(UtilTest, RuntimeTest_Cell_From_Grid)
-            {
-
-
-            }
-            TEST(UtilTest, RuntimeTest_Distance_Squared)
-            {
-
-
-            }
-            TEST(UtilTest, RuntimeTest_Rotate_Vector_About_Z)
-            {
-
-
-            }
+            unsigned int n = 1;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
 
         }
+        TEST(UtilTest, RuntimeTest_Cell_From_Grid)
+        {
 
+            unsigned int n = 1;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+        }
+        TEST(UtilTest, RuntimeTest_Distance_Squared)
+        {
+            unsigned int n = 2;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
 
+        }
+        TEST(UtilTest, RuntimeTest_Rotate_Vector_About_Z)
+        {
 
+            unsigned int n = 1;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+        }
 
     }
+
+
+    namespace FlockingTest
+    {
+        float dt = 0.001f;
+        float res = 2048.0f;
+
+        TEST(FlockingTest, RuntimeTest_Neighbourhood)
+        {
+
+        }
+        TEST(FlockingTest, RuntimeTest_Boid_Behaviour)
+        {
+
+
+        }
+
+        TEST(FlockingTest, RuntimeTest_Integrator)
+        {
+
+        }
+
+        TEST(FlockingTest, RuntimeTest_Seek)
+        {
+
+        }
+        TEST(FlockingTest, RuntimeTest_Flee)
+        {
+
+        }
+        TEST(FlockingTest, RuntimeTest_Wander)
+        {
+
+        }
+
+    }
+
+
 
 }
 
