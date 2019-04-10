@@ -146,7 +146,7 @@ int main(int argc, char** argv)
     /// GPU VERSION
     ///
 
-    float res = 2048;
+    float res = 2048.0f;
     FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
     flockSys.init();
     std::vector<float3> pos;

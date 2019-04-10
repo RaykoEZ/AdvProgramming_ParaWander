@@ -25,10 +25,9 @@ FlockSystem::FlockSystem(const uint &_numP, const float &_m, const float &_vMax,
     }
     h_params->setVMax(_vMax);
     h_params->setTimeStep(_dt);
-    h_spawnRad = _rad;
     h_frameCount = 0;
     h_init = false;
-    
+    h_blockSize = 0;
 
 }
 
@@ -121,8 +120,9 @@ void FlockSystem::tick()
     uint maxCellOcc = thrust::reduce(d_cellOcc.begin(), d_cellOcc.end(), 0, thrust::maximum<unsigned int>());
 
     /// define block dims to solve for ths frame
-    uint blockSize = 32 * ceil(maxCellOcc / 32.0f);
-    dim3 gridSize(h_params->getRes(), h_params->getRes());
+    h_blockSize = 32 * ceil(maxCellOcc / 32.0f);
+    
+    h_gridSize = dim3(h_params->getRes(), h_params->getRes());
 
 
     //uint * thread = thrust::raw_pointer_cast(&d_threadIdxCheck[0]);
@@ -143,12 +143,12 @@ void FlockSystem::tick()
 
     //std::cout << "maxCellOcc=" << maxCellOcc << ", blockSize=" << blockSize << ", gridSize=" << h_params->getRes() << "^2\n";
 
-    computeAvgNeighbourPos<<<gridSize, blockSize>>>(collision, targetPos, pos, cellOcc, scatter);
+    computeAvgNeighbourPos<<<h_gridSize, h_blockSize>>>(collision, targetPos, pos, cellOcc, scatter);
     cudaThreadSynchronize();
 
     //cudaErrorPrint();
     /// now we decide to wander if no collision, flee if there is collision
-    genericBehaviour<<<gridSize,blockSize>>>(
+    genericBehaviour<<<h_gridSize,h_blockSize>>>(
                                                velocity,
                                                colour,
                                                targetPos,
@@ -240,68 +240,41 @@ void FlockSystem::prepareBoids(const float &_nBoids,
 void FlockSystem::exportResult(std::vector<float3> &_posh, std::vector<float3> &_colh) const
 {
     thrust::copy(d_col.begin(), d_col.end(), _colh.begin());
-    thrust::copy(d_pos.begin(), d_pos.end(), _posh.begin());
+    thrust::copy(d_pos.begin(), d_pos.end(), _posh.begin());   
 
-    
-    //std::vector<uint> hashH;
-    //hashH.resize(h_params->getNumBoids());
-    //thrust::copy(d_hash.begin(),d_hash.end(), hashH.begin());
-    //std::vector<float3> vh;
-    //vh.resize(h_params->getNumBoids());
-    //std::vector<float3> targeth;
-    //targeth.resize(h_params->getNumBoids());
-    //thrust::copy(d_v.begin(), d_v.end(),vh.begin());
-    //thrust::copy(d_target.begin(), d_target.end(),targeth.begin());
+}
 
-    //std::vector<bool> collisionh;
-    //std::vector<float> angleh;
-    //std::vector<uint> occh;
-    //occh.resize(h_params->getRes2());
-    //angleh.resize(h_params->getNumBoids());
-    //collisionh.resize(h_params->getNumBoids());
-    //thrust::copy(d_cellOcc.begin(), d_cellOcc.end(),occh.begin());
-    //thrust::copy(d_isThereCollision.begin(), d_isThereCollision.end(),collisionh.begin());
-    //thrust::copy(d_angle.begin(), d_angle.end(),angleh.begin());
-    //std::cout<<"Num of Cells allocated: "<< h_params->getRes2() << '\n';
-    //uint size = h_params->getNumBoids();
-    /*
-    for(int i = 0; i< size;++i)
-    {
-        //std::cout<< "Collision check: "<< collisionh[i] << '\n';
-        //std::cout<< "Hash check: "<< hashH[i] << '\n';
+void FlockSystem::exportCollisionFlags(std::vector<bool> &_flagh) const
+{
+    thrust::copy(d_isThereCollision.begin(), d_isThereCollision.end(), _flagh.begin());  
+}
 
-        //std::cout<<"Angle Check: " << angleh[i] <<'\n';
-        //std::cout<<"Pos Check: "<< _posh[i].x << ", " << _posh[i].y<< '\n';
-        //std::cout<<"V Check: "<< vh[i].x << ", " << vh[i].y<< '\n';
-        //std::cout<<"Target Check: "<< targeth[i].x << ", " << targeth[i].y<< '\n';
+void FlockSystem::exportHashTable(std::vector<uint> &_hashh) const
+{
+    thrust::copy(d_hash.begin(), d_hash.end(), _hashh.begin());  
+}
 
-    }
-    */
-    //std::vector<uint> threadH;
-    //std::vector<uint> blockH;
-    //threadH.resize(d_threadIdxCheck.size());
-    //blockH.resize(d_blockIdxCheck.size());
+void FlockSystem::exportCellOcc(std::vector<uint> &_occh) const
+{
+    thrust::copy(d_cellOcc.begin(), d_cellOcc.end(), _occh.begin());  
+}
 
-    //thrust::copy(d_threadIdxCheck.begin(),d_threadIdxCheck.end(),threadH.begin());
-    //thrust::copy(d_blockIdxCheck.begin(),d_blockIdxCheck.end(),blockH.begin());
+void FlockSystem::exportAngles(std::vector<float> &_angleh) const
+{
+    thrust::copy(d_angle.begin(), d_angle.end(), _angleh.begin());  
+}
 
-    //for(int i = 0; i< threadH.size();++i)
-    //{
-        
-    //    std::cout<< "ThreadIdx check: "<< threadH[i]<<'\n';
+void FlockSystem::exportV(std::vector<float3> &_vh) const
+{
+    thrust::copy(d_v.begin(), d_v.end(), _vh.begin());  
+}
 
-        //std::cout<< "Occupancy check: "<< occh[i] << '\n'; 
-    //}
-    /*
-    for(int i = 0; i< h_params->getRes2();++i)
-    {
-        
-        //std::cout<< "BlockIdx check: "<< blockH[i].x << ", "<< blockH[i].y<<", "<<blockH[i].z<<'\n';
+void FlockSystem::exportVMax(std::vector<float> &_vMaxh) const
+{
+    thrust::copy(d_vMax.begin(), d_vMax.end(), _vMaxh.begin());  
+}
 
-        std::cout<< "Occupancy check in blocks: "<< blockH[i] << '\n'; 
-    }*/
-    
-
-
-
+void FlockSystem::exportTarget(std::vector<float3> &_targeth) const
+{
+    thrust::copy(d_target.begin(), d_target.end(), _targeth.begin()); 
 }

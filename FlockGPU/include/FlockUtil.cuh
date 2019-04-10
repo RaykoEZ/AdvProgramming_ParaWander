@@ -8,7 +8,6 @@
 __device__ int3 gridFromPoint(const float3 pt);
 __device__ uint cellFromGrid(const uint3 grid);
 __device__ uint cellFromGrid(const int3 grid);
-__device__ uint3 gridFromCell(const uint cell);
 __device__ float dist2(const float3 &_pos1, const float3 &_pos2);
 
 /// returns a vector rotated in the z-axis, angle param in radians 

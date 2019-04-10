@@ -24,6 +24,19 @@ public:
     void tick();
     /// copy device results to host for houdini .geo export
     void exportResult(std::vector<float3> &_posh, std::vector<float3> &_colh) const;
+    
+    /// Export these memebers to host for debugging and testing
+    void exportCollisionFlags(std::vector<bool> &_flagh) const;
+    void exportHashTable(std::vector<uint> &_hashh) const;
+    void exportCellOcc(std::vector<uint> &_occh) const;
+    void exportAngles(std::vector<float> &_angleh) const;
+    void exportV(std::vector<float3> &_vh) const;
+    void exportVMax(std::vector<float> &_vMaxh) const;
+    void exportTarget(std::vector<float3> &_targeth) const;
+
+    uint getBlockSize() const { return h_blockSize; }
+    dim3 getGridSize() const { return h_gridSize; }
+
 protected:
 
     void clear();
@@ -33,8 +46,9 @@ protected:
     /// Keep track of whether the simulation is ready to start
     bool h_init;
     uint h_frameCount;
-    float h_spawnRad;
 
+    uint h_blockSize;
+    dim3 h_gridSize;
     ///
     thrust::device_vector<bool> d_isThereCollision;
     thrust::device_vector<uint> d_hash;
@@ -47,17 +61,6 @@ protected:
     thrust::device_vector<float3> d_v;
     thrust::device_vector<float> d_vMax;
     thrust::device_vector<float3> d_target;
-
-    //thrust::device_vector<uint> d_threadIdxCheck;
-    //thrust::device_vector<uint> d_blockIdxCheck;
-
-
-
-
-    
-
-
-
 
 private:
     FlockParams* h_params;

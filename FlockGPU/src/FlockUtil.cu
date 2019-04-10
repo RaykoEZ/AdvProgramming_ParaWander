@@ -30,14 +30,7 @@ __device__ uint cellFromGrid(const int3 grid)
     return (isInside) ? cellFromGrid(make_uint3(grid.x, grid.y, 0)) : NULL_HASH;
 }
 
-__device__ uint3 gridFromCell(const uint cell)
-{
-    uint3 ret_val;
-    ret_val.z = 0;
-    ret_val.y = float(cell) * paramData.m_invRes;
-    ret_val.x = (cell - ret_val.y * paramData.m_res);
-    return ret_val;
-}
+
 __device__ float dist2(const float3 &_pos1, const float3 &_pos2)
 {
     float3 diff = _pos1 - _pos2;
