@@ -244,37 +244,8 @@ void FlockSystem::exportResult(std::vector<float3> &_posh, std::vector<float3> &
 
 }
 
-void FlockSystem::exportCollisionFlags(std::vector<bool> &_flagh) const
+template<typename T>
+void FlockSystem::exportDeviceVector(std::vector<T> &_out, const thrust::device_vector<T> &_in) const
 {
-    thrust::copy(d_isThereCollision.begin(), d_isThereCollision.end(), _flagh.begin());  
-}
-
-void FlockSystem::exportHashTable(std::vector<uint> &_hashh) const
-{
-    thrust::copy(d_hash.begin(), d_hash.end(), _hashh.begin());  
-}
-
-void FlockSystem::exportCellOcc(std::vector<uint> &_occh) const
-{
-    thrust::copy(d_cellOcc.begin(), d_cellOcc.end(), _occh.begin());  
-}
-
-void FlockSystem::exportAngles(std::vector<float> &_angleh) const
-{
-    thrust::copy(d_angle.begin(), d_angle.end(), _angleh.begin());  
-}
-
-void FlockSystem::exportV(std::vector<float3> &_vh) const
-{
-    thrust::copy(d_v.begin(), d_v.end(), _vh.begin());  
-}
-
-void FlockSystem::exportVMax(std::vector<float> &_vMaxh) const
-{
-    thrust::copy(d_vMax.begin(), d_vMax.end(), _vMaxh.begin());  
-}
-
-void FlockSystem::exportTarget(std::vector<float3> &_targeth) const
-{
-    thrust::copy(d_target.begin(), d_target.end(), _targeth.begin()); 
+    thrust::copy(_in.begin(), _in.end(), _out.begin());
 }

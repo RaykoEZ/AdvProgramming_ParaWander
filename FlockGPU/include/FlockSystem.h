@@ -24,15 +24,11 @@ public:
     void tick();
     /// copy device results to host for houdini .geo export
     void exportResult(std::vector<float3> &_posh, std::vector<float3> &_colh) const;
-    
-    /// Export these memebers to host for debugging and testing
-    void exportCollisionFlags(std::vector<bool> &_flagh) const;
-    void exportHashTable(std::vector<uint> &_hashh) const;
-    void exportCellOcc(std::vector<uint> &_occh) const;
-    void exportAngles(std::vector<float> &_angleh) const;
-    void exportV(std::vector<float3> &_vh) const;
-    void exportVMax(std::vector<float> &_vMaxh) const;
-    void exportTarget(std::vector<float3> &_targeth) const;
+    /// Export memebers to host for debugging and testing
+    template<typename T>
+    void exportDeviceVector(std::vector<T> &_out, const thrust::device_vector<T> &_in) const;
+
+
 
     uint getBlockSize() const { return h_blockSize; }
     dim3 getGridSize() const { return h_gridSize; }

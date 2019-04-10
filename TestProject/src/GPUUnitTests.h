@@ -4,6 +4,7 @@
 #include <vector>
 #include "FlockSystem.h"
 #include "DeviceTestKernels.cuh"
+/// @file Unit tests for GPU impl are all implemented here:
 
 namespace GPUUnitTests
 {
@@ -36,7 +37,6 @@ namespace GPUUnitTests
 
             std::vector<uint> hash;
             hash.resize(n);
-            flockSys.exportHashTable(hash);
 
 
 
@@ -45,25 +45,25 @@ namespace GPUUnitTests
         {
             unsigned int n = 1;
             FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+            flockSys.init();
+            flockSys.tick();
+
+
 
         }
         TEST(UtilTest, RuntimeTest_Cell_From_Grid)
         {
 
-            unsigned int n = 1;
-            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+
         }
         TEST(UtilTest, RuntimeTest_Distance_Squared)
         {
-            unsigned int n = 2;
-            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+
 
         }
         TEST(UtilTest, RuntimeTest_Rotate_Vector_About_Z)
         {
 
-            unsigned int n = 1;
-            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
         }
 
     }
@@ -72,23 +72,34 @@ namespace GPUUnitTests
     namespace FlockingTest
     {
         float dt = 0.001f;
-        float res = 2048.0f;
+        float res = 128.0f;
 
         TEST(FlockingTest, RuntimeTest_Neighbourhood)
         {
+            unsigned int n = 100;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+            flockSys.init();
+            flockSys.tick();
+
+            std::vector<bool> collisionFlag;
+            hash.resize(n);
+
 
         }
+
         TEST(FlockingTest, RuntimeTest_Boid_Behaviour)
         {
-
-
+            unsigned int n = 1;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+            flockSys.init();
+            flockSys.tick();
         }
+
 
         TEST(FlockingTest, RuntimeTest_Integrator)
         {
 
         }
-
         TEST(FlockingTest, RuntimeTest_Seek)
         {
 
