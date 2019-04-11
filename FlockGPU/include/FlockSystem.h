@@ -33,6 +33,20 @@ public:
     uint getBlockSize() const { return h_blockSize; }
     dim3 getGridSize() const { return h_gridSize; }
 
+
+
+        ///
+    thrust::device_vector<bool> d_isThereCollision;
+    thrust::device_vector<uint> d_hash;
+    thrust::device_vector<uint> d_cellOcc;
+    thrust::device_vector<uint> d_scatterAddress;
+    thrust::device_vector<float> d_vMax;
+    /// @brief a random number between 0 and 1 for steering angle
+    thrust::device_vector<float> d_angle;
+    thrust::device_vector<float3> d_col;
+    thrust::device_vector<float3> d_pos;
+    thrust::device_vector<float3> d_v;
+    thrust::device_vector<float3> d_target;
 protected:
 
     void clear();
@@ -45,18 +59,7 @@ protected:
 
     uint h_blockSize;
     dim3 h_gridSize;
-    ///
-    thrust::device_vector<bool> d_isThereCollision;
-    thrust::device_vector<uint> d_hash;
-    thrust::device_vector<uint> d_cellOcc;
-    thrust::device_vector<uint> d_scatterAddress;
-    /// @brief a random number between 0 and 1 for steering angle
-    thrust::device_vector<float> d_angle;
-    thrust::device_vector<float3> d_col;
-    thrust::device_vector<float3> d_pos;
-    thrust::device_vector<float3> d_v;
-    thrust::device_vector<float> d_vMax;
-    thrust::device_vector<float3> d_target;
+
 
 private:
     FlockParams* h_params;

@@ -27,20 +27,7 @@ namespace GPUUnitTests
         float dt = 0.001f;
         float res = 128.0f;
 
-        TEST(UtilTest, RuntimeTest_Hash)
-        {
-            unsigned int n = 100;
-            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
-
-            flockSys.init();
-            flockSys.tick();
-
-            std::vector<uint> hash;
-            hash.resize(n);
-
-
-
-        }
+        
         TEST(UtilTest, RuntimeTest_Grid_From_Pos)
         {
             unsigned int n = 1;
@@ -74,7 +61,31 @@ namespace GPUUnitTests
         float dt = 0.001f;
         float res = 128.0f;
 
-        TEST(FlockingTest, RuntimeTest_Neighbourhood)
+        TEST(FlockingTest, RuntimeTest_Hashing_and_Boid_Spawn)
+        {
+            uint n = 100;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+
+            flockSys.init();
+            flockSys.tick();
+
+            std::vector<uint> hash;
+            hash.resize(n);
+            flockSys.exportDeviceVector<uint>(hash,flockSys.d_hash);
+            /// test if all boids have valid hash upon spawning
+            bool boidInRange = true;
+            for(uint i = 0 ;i < n ; ++i)
+            {
+                if(hash[i] == NULL_HASH)
+                {
+                    boidInRange = false;
+                }
+            }
+            EXPECT_TRUE(boidInRange);
+
+
+        }
+        TEST(FlockingTest, RuntimeTest_Neighbourhood_and_collision)
         {
             unsigned int n = 100;
             FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
@@ -82,17 +93,14 @@ namespace GPUUnitTests
             flockSys.tick();
 
             std::vector<bool> collisionFlag;
-            hash.resize(n);
-
-
+            collisionFlag.resize(n);
+            flockSys.exportDeviceVector<bool>(collisionFlag,flockSys.d_isThereCollision);
+            
         }
 
         TEST(FlockingTest, RuntimeTest_Boid_Behaviour)
         {
-            unsigned int n = 1;
-            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
-            flockSys.init();
-            flockSys.tick();
+
         }
 
 

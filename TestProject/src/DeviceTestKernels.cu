@@ -1,46 +1,49 @@
 #include "DeviceTestKernels.cuh"
 
-__host__ int3 callGridFromPoint(const float3 _pt)
+__global__ void callGridFromPoint( int3 *_gridIdx, float3 *_pt)
 {
-    int3 ret = make_int3(0,0,0);
-    return ret;
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
+    _gridIdx[gIdx] = gridFromPoint(_pt[gIdx]);
 }
-__host__ uint callCellFromGrid(const int3 _grid)
+__global__ void callCellFromGrid( uint *_cellIdx, int3 *_grid)
 {
-    uint ret = 0;
-    return ret;
-}
-__host__ float callDist2(const float3 &_pos1, const float3 &_pos2)
-{
-    float ret = 0.0f;
-    return ret;
-}
-__host__ float3 callRotateZ(const float3 &_v, const float &_angle)
-{
-    float3 ret = make_float3(0.0f,0.0f,0.0f);
-    return ret;
-}
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
 
-__host__ void callResolveForce(float3 &_pos, float3 &_v, const float3 &_f, const float &_vMax)
+    _cellIdx[gIdx] = cellFromGrid(_grid[gIdx]);
+}
+__global__ void callDist2( float *_dist2, float3 *_pos1,  float3 *_pos2)
 {
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
+    _dist2[gIdx] = dist2(_pos1[gIdx],_pos2[gIdx]);
+}
+__global__ void callRotateZ( float3 *_rot, float3 *_v,  float *_angle)
+{
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
+    _rot[gIdx] = rotateZ(_v[gIdx],_angle[gIdx]);
 
 }
 
-
-__host__ float3 callWander(const float &_angle, const float3 &_v, const float3 &_pos)
+__global__ void callResolveForce(float3 *_pos, float3 *_v, const float3 &_f, const float &_vMax)
 {
-    float3 ret = make_float3(0.0f,0.0f,0.0f);
-    return ret;
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
+    callResolveForce(_pos[gIdx], _v[gIdx], _f[gIdx], _vMax);
 }
 
-__host__ float3 callSeek( const float3  &_pos,  float3  &_v, const float3 &_target, const float &_vMax)
+
+__global__ void callWander( float3 *_target, float *_angle,  float3 *_v,  float3 *_pos)
 {
-    float3 ret = make_float3(0.0f,0.0f,0.0f);
-    return ret;
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
+    _target[gIdx] = boidWanderPattern(_angle[gIdx], _v[gIdx], _pos[gIdx]);
 }
 
-__host__ float3 callFlee( const float3  &_pos,  float3  &_v, const float3  &_target, const float &_vMax)
+__global__ void callSeek(  float3 *_f, float3  *_pos,  float3  *_v,  float3 *_target, const float &_vMax)
 {
-    float3 ret = make_float3(0.0f,0.0f,0.0f);
-    return ret;
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
+    _f[gIdx] = boidSeekPattern(_pos[gIdx], _v[gIdx], _target[gIdx], _vMax);
+}
+
+__global__ void callFlee(  float3 *_f, float3  *_pos,  float3  *_v,  float3  *_target, const float &_vMax)
+{
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
+    _f[gIdx] = boidFleePattern(_pos[gIdx], _v[gIdx], _target[gIdx], _vMax);
 }
