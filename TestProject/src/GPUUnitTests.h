@@ -4,6 +4,8 @@
 #include <vector>
 #include "FlockSystem.h"
 #include "DeviceTestKernels.cuh"
+#include "helper_math.h"
+
 /// @file Unit tests for GPU impl are all implemented here:
 
 namespace GPUUnitTests
@@ -19,6 +21,10 @@ namespace GPUUnitTests
                    << _val << " is outside the range " << _min << " to " << _max;
     }  
     
+
+
+
+
     /// Test for device and global kernels
 
 
@@ -31,7 +37,7 @@ namespace GPUUnitTests
         TEST(UtilTest, RuntimeTest_Grid_From_Pos)
         {
             unsigned int n = 1;
-            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+            FlockSystem flockSys(n,10.0f,0.1f,dt,res);
             flockSys.init();
             flockSys.tick();
 
@@ -64,14 +70,12 @@ namespace GPUUnitTests
         TEST(FlockingTest, RuntimeTest_Hashing_and_Boid_Spawn)
         {
             uint n = 100;
-            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
+            FlockSystem flockSys(n,10.0f,0.1f,dt,res);
 
             flockSys.init();
             flockSys.tick();
 
-            std::vector<uint> hash;
-            hash.resize(n);
-            flockSys.exportDeviceVector<uint>(hash,flockSys.d_hash);
+            std::vector<uint> hash = flockSys.getHash();
             /// test if all boids have valid hash upon spawning
             bool boidInRange = true;
             for(uint i = 0 ;i < n ; ++i)
@@ -87,25 +91,106 @@ namespace GPUUnitTests
         }
         TEST(FlockingTest, RuntimeTest_Neighbourhood_and_collision)
         {
-            unsigned int n = 100;
-            FlockSystem flockSys(n,10.0f,0.1f,dt,1.0f,res);
-            flockSys.init();
-            flockSys.tick();
+            unsigned int n = 1000;
+            uint numCollision = 0;
+            FlockSystem flockSys(n,10.0f,0.1f,dt,res);
 
+            std::vector<float3> colourFlag;
             std::vector<bool> collisionFlag;
-            collisionFlag.resize(n);
-            flockSys.exportDeviceVector<bool>(collisionFlag,flockSys.d_isThereCollision);
+            std::vector<uint> collidingBoidIdx;
+            std::vector<uint> otherBoidIdx;
+            while (numCollision == 0)
+            {
+                otherBoidIdx.clear();
+                flockSys.init();
+                flockSys.tick();
+                collisionFlag = flockSys.getCollisionFlag();
+                for(uint i = 0; i < collisionFlag.size(); ++i)
+                {
+                    if(collisionFlag[i])
+                    {
+                        ++numCollision;
+                        collidingBoidIdx.push_back(i);
+
+                    }
+                    else
+                    {
+                        otherBoidIdx.push_back(i);
+                    }
+                }
+            }
+            // check if there are more than 1 boid in a collision event
+            EXPECT_GT(numCollision, 1);
+            colourFlag = flockSys.getColour();
+
+            // check for correct colour flags
+            for(uint i =0; i< numCollision; ++i)
+            {
+                EXPECT_FLOAT_EQ(colourFlag[collidingBoidIdx[i]].x, 255.0f);
+                EXPECT_FLOAT_EQ(colourFlag[collidingBoidIdx[i]].y, 0.0f);
+                EXPECT_FLOAT_EQ(colourFlag[collidingBoidIdx[i]].z, 0.0f);
+
+            }
+
+            for(uint i = 0; i < otherBoidIdx.size(); ++i )
+            {
+                EXPECT_FLOAT_EQ(colourFlag[otherBoidIdx[i]].x, 0.0f);
+                EXPECT_FLOAT_EQ(colourFlag[otherBoidIdx[i]].y, 255.0f);
+                EXPECT_FLOAT_EQ(colourFlag[otherBoidIdx[i]].z, 0.0f);
+
+            }
+
             
         }
 
-        TEST(FlockingTest, RuntimeTest_Boid_Behaviour)
-        {
-
-        }
-
-
         TEST(FlockingTest, RuntimeTest_Integrator)
         {
+            unsigned int n = 1;
+            float mass = 10.0f;
+            FlockSystem flockSys(n,mass,0.1f,dt,res);
+            flockSys.init();
+
+            /// test cases:
+            /// - new v mag is a zero vector (v + f/m = 0), new pos == pos
+            /// - new v mag is non-zero, within min and max of vMax ( -vMax <= v + f/m <= vMax), new pos = pos + norm(v) * dt
+            /// - new v mag is non-zero, outside of vMax max-boundary ( -vMax > v + f/m ), new pos = pos + norm(clamp(v)) * dt
+            /// - new v mag is non-zero, outside of vMax min-boundary (v + f/m > vMax), new pos = pos + norm(clamp(v)) * dt
+            std::vector<float3> posH
+            {
+                make_float3(0.0f,0.0f,0.0f),
+                make_float3(0.0f,0.0f,0.0f),
+                make_float3(0.0f,0.0f,0.0f),
+                make_float3(0.0f,0.0f,0.0f)
+            };
+
+            std::vector<float3> vH
+            {
+                make_float3(0.0f,0.0f,0.0f),
+                make_float3(1.0f,0.0f,0.0f),
+                make_float3(1.0f,0.0f,0.0f),
+                make_float3(-1.0f,0.0f,0.0f)
+
+            };
+            std::vector<float3> fH
+            {
+                make_float3(0.0f,0.0f,0.0f),
+                make_float3(10.0f,0.0f,0.0f),
+                make_float3(110.0f,0.0f,0.0f),
+                make_float3(-110.0f,0.0f,0.0f)
+            };
+            float vMax = 10.0f;
+
+
+            thrust::device_vector<float3> pos = posH;
+            thrust::device_vector<float3> v = vH;
+            thrust::device_vector<float3> f = fH;
+
+            testResolveForce(pos, v, f, vMax);
+
+            thrust::copy(pos.begin(),pos.end(),posH.begin());
+            thrust::copy(v.begin(),v.end(),vH.begin());
+            thrust::copy(f.begin(),f.end(),fH.begin());
+
 
         }
         TEST(FlockingTest, RuntimeTest_Seek)
@@ -122,8 +207,6 @@ namespace GPUUnitTests
         }
 
     }
-
-
 
 }
 

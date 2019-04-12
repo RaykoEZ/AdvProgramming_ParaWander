@@ -8,7 +8,7 @@
 #include "Random.cuh"
 
 
-FlockSystem::FlockSystem(const uint &_numP, const float &_m, const float &_vMax, const float &_dt, const float &_rad, const float &_res)
+FlockSystem::FlockSystem(const uint &_numP, const float &_m, const float &_vMax, const float &_dt, const float &_res)
 {
     h_params = new FlockParams(_numP,_m,_vMax,_dt,_res);
     h_params->setNumBoids(_numP);
@@ -244,8 +244,66 @@ void FlockSystem::exportResult(std::vector<float3> &_posh, std::vector<float3> &
 
 }
 
-template<typename T>
-void FlockSystem::exportDeviceVector(std::vector<T> &_out, const thrust::device_vector<T> &_in) const
+
+std::vector<bool> FlockSystem::getCollisionFlag() const
 {
-    thrust::copy(_in.begin(), _in.end(), _out.begin());
+    std::vector<bool> host(d_isThereCollision.size());
+    thrust::copy(d_isThereCollision.begin(),d_isThereCollision.end(),host.begin());
+    return host;
+}
+std::vector<uint> FlockSystem::getHash() const 
+{
+    std::vector<uint> host(d_hash.size());
+    thrust::copy(d_hash.begin(),d_hash.end(),host.begin());
+    return host;
+}
+std::vector<uint> FlockSystem::getCellOcc() const
+{
+    std::vector<uint> host(d_cellOcc.size());
+    thrust::copy(d_cellOcc.begin(),d_cellOcc.end(),host.begin());
+    return host;
+}
+std::vector<uint> FlockSystem::getScatterAddress() const
+{
+    std::vector<uint> host(d_scatterAddress.size());
+    thrust::copy(d_scatterAddress.begin(),d_scatterAddress.end(),host.begin());
+    return host;
+}
+std::vector<float> FlockSystem::getVMax() const
+{
+    std::vector<float> host(d_vMax.size());
+    thrust::copy(d_vMax.begin(),d_vMax.end(),host.begin());
+    return host;
+}
+
+std::vector<float> FlockSystem::getAngle() const
+{
+    std::vector<float> host(d_angle.size());
+    thrust::copy(d_angle.begin(),d_angle.end(),host.begin());
+    return host;
+
+}
+std::vector<float3> FlockSystem::getColour() const
+{
+    std::vector<float3> host(d_col.size());
+    thrust::copy(d_col.begin(),d_col.end(),host.begin());
+    return host;
+}
+std::vector<float3> FlockSystem::getPos() const
+{
+    std::vector<float3> host(d_pos.size());
+    thrust::copy(d_pos.begin(),d_pos.end(),host.begin());
+    return host;
+}
+std::vector<float3> FlockSystem::getV() const
+{
+    std::vector<float3> host(d_v.size());
+    thrust::copy(d_v.begin(),d_v.end(),host.begin());
+    return host;
+}
+std::vector<float3> FlockSystem::getTarget() const
+{
+    std::vector<float3> host(d_target.size());
+    thrust::copy(d_target.begin(),d_target.end(),host.begin());
+    return host;
 }
