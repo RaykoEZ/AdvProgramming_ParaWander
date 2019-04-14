@@ -26,36 +26,69 @@ namespace GPUUnitTests
             std::vector<float3> posH
             {
                 make_float3(0.0f,0.0f,0.0f),
-                make_float3(0.0f,0.0f,0.0f),
-                make_float3(0.0f,0.0f,0.0f)
+                make_float3(1.0f,0.5f,0.0f),
+                make_float3(-0.5f,0.0f,0.0f)
             };
 
-            std::vector<int3> vH
+            std::vector<int3> gridIdxH
             {
                 make_int3(0,0,0),
                 make_int3(0,0,0),
                 make_int3(0,0,0)
-
             };
 
+            thrust::device_vector<float3> pos = posH;
+            thrust::device_vector<int3> gridIdx = gridIdxH;
+
+            testGridFromPoint(gridIdx, pos);
+
+            thrust::copy(gridIdx.begin(), gridIdx.end(), gridIdxH.begin());
+
+            EXPECT_EQ(gridIdxH[0].x, 0);
+            EXPECT_EQ(gridIdxH[0].y, 0);
+            EXPECT_EQ(gridIdxH[0].z, 0);
+
+            EXPECT_EQ(gridIdxH[1].x, 128);
+            EXPECT_EQ(gridIdxH[1].y, 64);
+            EXPECT_EQ(gridIdxH[1].z, 0);
+
+            EXPECT_EQ(gridIdxH[2].x, -64);
+            EXPECT_EQ(gridIdxH[2].y, 0);
+            EXPECT_EQ(gridIdxH[2].z, 0);
         }
+
+
         TEST(UtilTest, RuntimeTest_Cell_From_Grid)
         {
             unsigned int n = 1;
             FlockSystem flockSys(n,10.0f,0.1f,dt,res);
             flockSys.init();
 
-
-            std::vector<int3> vH
+            /// Test cases: inside the grids, outside and on the boundary
+            std::vector<int3> gridIdxH
             {
-                make_int3(0,0,0),
-                make_int3(0,0,0),
-                make_int3(0,0,0)
+                make_int3(1,1,0), // second cell on second row
+                make_int3(-res,res+1,0), // out of bound
+                make_int3(res,res,0) // last cell 
 
             };
 
-            std::vector<uint> vH {0,0,0};
+            std::vector<uint> cellIdxH {0,0,0};
+
+            thrust::device_vector<uint> cellIdx = cellIdxH;
+            thrust::device_vector<int3> gridIdx = gridIdxH;
+
+            testCellFromGrid(cellIdx, gridIdx);
+
+            thrust::copy(cellIdx.begin(), cellIdx.end(), cellIdxH.begin());
+
+            EXPECT_EQ(cellIdxH[0], 129);
+            EXPECT_EQ(cellIdxH[1], NULL_HASH);
+            EXPECT_EQ(cellIdxH[2], (res*res) + res);
+
         }
+
+
         TEST(UtilTest, RuntimeTest_Distance_Squared)
         {
             unsigned int n = 1;
@@ -66,21 +99,30 @@ namespace GPUUnitTests
             {
                 make_float3(0.0f,0.0f,0.0f),
                 make_float3(0.0f,0.0f,0.0f),
-                make_float3(0.0f,0.0f,0.0f),
                 make_float3(0.0f,0.0f,0.0f)
             };
 
             std::vector<float3> pos2H
             {
                 make_float3(0.0f,0.0f,0.0f),
-                make_float3(1.0f,0.0f,0.0f),
-                make_float3(1.0f,0.0f,0.0f),
-                make_float3(-1.0f,0.0f,0.0f)
+                make_float3(12.0f,9.0f,0.0f),
+                make_float3(-12.0f,-9.0f,0.0f)
 
             };
 
             std::vector<float> dist2H {0.0f,0.0f,0.0f};
+
+            thrust::device_vector<float3> pos1 = pos1H;
+            thrust::device_vector<float3> pos2 = pos2H;
+            thrust::device_vector<float> dist2 = dist2H;
             
+            testDist2(dist2, pos1, pos2);
+            thrust::copy(dist2.begin(), dist2.end(), dist2H.begin());
+
+            EXPECT_FLOAT_EQ(dist2H[0], 0);
+            EXPECT_FLOAT_EQ(dist2H[1], 225);
+            EXPECT_FLOAT_EQ(dist2H[2], 225);
+
         }
 
         TEST(UtilTest, RuntimeTest_Rotate_Vector_About_Z)
@@ -118,7 +160,34 @@ namespace GPUUnitTests
                 1.0f
             };
 
+            thrust::device_vector<float> angle = angleH;
+            thrust::device_vector<float3> rot = rotH;
+            thrust::device_vector<float3> v = vH;
 
+            testRotateZ(rot, v, angle);
+
+            thrust::copy(rot.begin(), rot.end(), rotH.begin());
+
+
+            EXPECT_FLOAT_EQ(rotH[0].x, 1.0f);
+            EXPECT_FLOAT_EQ(rotH[0].y, 1.0f);
+            EXPECT_FLOAT_EQ(rotH[0].z, 0.0f);
+                       
+            EXPECT_FLOAT_EQ(rotH[1].x, 0.0f);
+            EXPECT_FLOAT_EQ(rotH[1].y, 1.414213562f);
+            EXPECT_FLOAT_EQ(rotH[1].z, 0.0f);
+            
+            EXPECT_FLOAT_EQ(rotH[2].x, 1.0f);
+            EXPECT_FLOAT_EQ(rotH[2].y, -1.0f);
+            EXPECT_FLOAT_EQ(rotH[2].z, 0.0f);
+            
+            EXPECT_FLOAT_EQ(rotH[3].x, -1.0f);
+            EXPECT_FLOAT_EQ(rotH[3].y, -1.0f);
+            EXPECT_FLOAT_EQ(rotH[3].z, 0.0f);
+            
+            EXPECT_FLOAT_EQ(rotH[4].x, 1.0f);
+            EXPECT_FLOAT_EQ(rotH[4].y, 1.0f);
+            EXPECT_FLOAT_EQ(rotH[4].z, 0.0f);
 
         }
 
