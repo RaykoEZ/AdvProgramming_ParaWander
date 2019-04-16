@@ -3,8 +3,13 @@
 #include <fstream>
 #include <sstream>
 #include "World.h"
-#include "CPUUnitTests.h"
-#include "GPUUnitTests.h"
+#include <vector>
+#include "gtest/gtest.h"
+#include "FlockSystem.h"
+#include "DeviceTestKernels.cuh"
+#include "helper_math.h"
+//#include "CPUUnitTests.h"
+//#include "GPUUnitTests.h"
 /// Dump our data from the fluid problem to a file
 /// Taken from: https://github.com/NCCA/libfluid/blob/master/test/src/main.cpp
 /// By Richard Southern

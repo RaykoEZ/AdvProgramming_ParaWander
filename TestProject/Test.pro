@@ -11,11 +11,9 @@ INCLUDEPATH +=./include \
               $$PWD/../FlockCPU/include \
 
 HEADERS += \
-    src/CPUUnitTests.h \
-    src/GPUUnitTests.h \
     $$PWD/src/*.cuh
 
-SOURCES += $$PWD/src/main.cpp
+SOURCES += $$PWD/src/*.cpp
 
 unix:{
    LIBS+= -lgtest -lbenchmark
