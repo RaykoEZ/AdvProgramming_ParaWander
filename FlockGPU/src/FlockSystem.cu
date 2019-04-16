@@ -15,13 +15,13 @@ FlockSystem::FlockSystem(const uint &_numP, const float &_m, const float &_vMax,
     if(_m > 0.0f)
     {
         h_params->setMass(_m);
-        h_params->setInverseMass(1.0f/_m);
+        h_params->setInverseMass(_m);
 
     } 
     else
     {
         h_params->setMass(DEFAULT_MASS);
-        h_params->setInverseMass(DEFAULT_MASS_INV);
+        h_params->setInverseMass(DEFAULT_MASS);
     }
     h_params->setVMax(_vMax);
     h_params->setTimeStep(_dt);

@@ -21,15 +21,15 @@ __global__ void callDist2( float *_dist2, float3 *_pos1,  float3 *_pos2)
 __global__ void callRotateZ( float3 *_rot, float3 *_v,  float *_angle)
 {
     uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
-    _rot[gIdx] = rotateZ(_v[gIdx],_angle[gIdx]);
+    _rot[gIdx] = rotateZ(_v[gIdx],_angle[gIdx] * 360.0f * RADIANS_F);
 
 }
 
 __global__ void callResolveForce(float3 *_pos, float3 *_v, const float3 *_f, const float _vMax)
 {
-    //uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
+    uint gIdx = blockIdx.x *blockDim.x + threadIdx.x;
     //resolveForce(_pos[gIdx], _v[gIdx], _f[gIdx], _vMax);
-    resolveForce(_pos[threadIdx.x], _v[threadIdx.x], _f[threadIdx.x], _vMax);
+    resolveForce(_pos[gIdx], _v[gIdx], _f[gIdx], _vMax);
 }
 
 
@@ -89,13 +89,13 @@ void testResolveForce(
     thrust::device_vector<float3> &_pos, 
     thrust::device_vector<float3> &_v, 
     thrust::device_vector<float3> &_f, 
-    const float &_vMax)
+    float &_vMax)
 {
     float3 * pos = thrust::raw_pointer_cast(&_pos[0]);
     float3 * v = thrust::raw_pointer_cast(&_v[0]);
     float3 * f = thrust::raw_pointer_cast(&_f[0]);
 
-    thrust::device_ptr<const float> vMax(&_vMax);
+    thrust::device_ptr<float> vMax(&_vMax);
     std::cout<< "Test case count: " << *vMax.get() <<'\n';
 
     callResolveForce<<<1, _pos.size()>>>( pos, v, f, *vMax.get());

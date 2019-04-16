@@ -126,18 +126,19 @@ __device__ void resolveForce(
 {
    
 
-    float3 accel = make_float3(_f.x * paramData.m_invMass,_f.y * paramData.m_invMass,0.0f);
-    float3 oldV = make_float3(_v.x + accel.x,_v.y + accel.y,0.0f);
+    float3 accel = make_float3(_f.x * paramData.m_invMass , _f.y * paramData.m_invMass , 0.0f);
+
+    _v = make_float3(_v.x + accel.x,_v.y + accel.y,0.0f);
 
     if(length(_v) > 0.0f)
     {
-        _v = clamp(oldV,
+        _v = clamp(_v,
                 make_float3(-_vMax,-_vMax,0.0f),
                 make_float3(_vMax,_vMax,0.0f));
         _v = normalize(_v);
 
     }
     
-    _pos = _pos + _v*paramData.m_dt;
+    _pos = _pos + _v * paramData.m_dt;
 
 }

@@ -23,7 +23,7 @@ void testResolveForce(
     thrust::device_vector<float3> &_pos, 
     thrust::device_vector<float3> &_v, 
     thrust::device_vector<float3> &_f, 
-    const float &_vMax);
+    float &_vMax);
 
 void testWander( 
     thrust::device_vector<float3> &_target, 

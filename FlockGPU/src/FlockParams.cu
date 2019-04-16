@@ -42,7 +42,7 @@ void FlockParams::setMass(const float &_m)
 
 void FlockParams::setInverseMass(const float &_m)
 {
-    if(_m < 0)
+    if(_m > 0)
     {
         m_data.m_invMass = 1.0f/_m;
     }

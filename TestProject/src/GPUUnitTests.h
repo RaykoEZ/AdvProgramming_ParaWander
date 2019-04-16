@@ -172,13 +172,14 @@ namespace GPUUnitTests
             EXPECT_FLOAT_EQ(rotH[0].x, 1.0f);
             EXPECT_FLOAT_EQ(rotH[0].y, 1.0f);
             EXPECT_FLOAT_EQ(rotH[0].z, 0.0f);
-                       
-            EXPECT_FLOAT_EQ(rotH[1].x, 0.0f);
+
+            /// 8 d.p. of precision bound
+            EXPECT_NEAR(rotH[1].x, 0.0f,8);
             EXPECT_FLOAT_EQ(rotH[1].y, 1.414213562f);
             EXPECT_FLOAT_EQ(rotH[1].z, 0.0f);
             
-            EXPECT_FLOAT_EQ(rotH[2].x, 1.0f);
-            EXPECT_FLOAT_EQ(rotH[2].y, -1.0f);
+            EXPECT_FLOAT_EQ(rotH[2].x, -1.0f);
+            EXPECT_FLOAT_EQ(rotH[2].y, 1.0f);
             EXPECT_FLOAT_EQ(rotH[2].z, 0.0f);
             
             EXPECT_FLOAT_EQ(rotH[3].x, -1.0f);
@@ -298,10 +299,9 @@ namespace GPUUnitTests
             std::vector<float3> vH
             {
                 make_float3(0.0f,0.0f,0.0f),
-                make_float3(1.0f,0.0f,0.0f),
-                make_float3(1.0f,0.0f,0.0f),
-                make_float3(-1.0f,0.0f,0.0f)
-
+                make_float3(0.0f,0.0f,0.0f),
+                make_float3(0.0f,0.0f,0.0f),
+                make_float3(0.0f,0.0f,0.0f)
             };
             std::vector<float3> fH
             {
@@ -311,7 +311,6 @@ namespace GPUUnitTests
                 make_float3(-150.0f,-90.0f,0.0f)
             };
             float vMax = 12.0f;
-
 
             thrust::device_vector<float3> pos = posH;
             thrust::device_vector<float3> v = vH;
@@ -326,23 +325,27 @@ namespace GPUUnitTests
             /// - new v mag is non-zero, within min and max of vMax ( -vMax <= v + f/m <= vMax), new pos = pos + norm(v) * dt
             /// - new v mag is non-zero, outside of vMax max-boundary ( -vMax > v + f/m ), new pos = pos + norm(clamp(v)) * dt
             /// - new v mag is non-zero, outside of vMax min-boundary (v + f/m > vMax), new pos = pos + norm(clamp(v)) * dt
+
+
             EXPECT_FLOAT_EQ(posH[0].x, 0.0f);
             EXPECT_FLOAT_EQ(posH[0].y, 0.0f);
             EXPECT_FLOAT_EQ(posH[0].z, 0.0f);
 
+
             /// f.x = 10 / 10 => 1
             /// newV = (2, 0, 0)
             /// outV = norm(2, 0, 0) => (1, 0, 0)
-            /// pos = pos + dt =>  (0.01, 0, 0)
+            /// pos = pos + dt =>  (0.1, 0, 0)
 
             EXPECT_FLOAT_EQ(posH[1].x, 0.1f);
             EXPECT_FLOAT_EQ(posH[1].y, 0.0f);
             EXPECT_FLOAT_EQ(posH[1].z, 0.0f);
 
             /// f.x = 150 / 10 => 15 , 90/10 => 9
-            /// newV = (16, 9, 0) clamp it
+            /// newV = (15, 9, 0) clamp it
             /// outV = norm(12, 9, 0) => (12/15, 9/15, 0) => (0.8. 0.6, 0)
             /// pos = pos + dt =>  (8e-2, 6e-2, 0)
+
             EXPECT_FLOAT_EQ(posH[2].x, 0.08f);
             EXPECT_FLOAT_EQ(posH[2].y, 0.06f);
             EXPECT_FLOAT_EQ(posH[2].z, 0.0f);
@@ -484,7 +487,7 @@ namespace GPUUnitTests
             std::vector<float3> posH
             {
                 make_float3(0.0f,0.0f,0.0f),
-                make_float3(0.0f,0.0f,0.0f).
+                make_float3(0.0f,0.0f,0.0f),
                 make_float3(0.0f,0.0f,0.0f),
                 make_float3(0.0f,0.0f,0.0f),
                 make_float3(0.0f,0.0f,0.0f)
@@ -516,31 +519,33 @@ namespace GPUUnitTests
             testWander(target, angle, v, pos);
             thrust::copy(target.begin(),target.end(),targetH.begin());
 
-            /// future dir = (10, 10, 0)
-            /// rotate by 0 => (10, 10, 0)
-            /// rotate by pi/4 => (0, 10 x root(2), 0)
-            /// rotate by pi/2 => (10, -10, 0)
-            /// rotate by pi => (-10, -10, 0)
-            /// rotate by 2 pi => (10, 10, 0)
+            /// future target pos = (10, 10, 0)
+            /// -------------------------------------------
+            /// rotate by 0 => (1, 1, 0)
+            /// rotate by pi/4 => (0,  root(2), 0)
+            /// rotate by pi/2 => (-1, 1, 0)
+            /// rotate by pi => (-1, -1, 0)
+            /// rotate by 2 pi => (1, 1, 0)
+            /// All rots are added to future target to derive new random target ahead
 
-            EXPECT_FLOAT_EQ(targetH[0].x, 10.0f);
-            EXPECT_FLOAT_EQ(targetH[0].y, 10.0f);
+            EXPECT_FLOAT_EQ(targetH[0].x, 11.0f);
+            EXPECT_FLOAT_EQ(targetH[0].y, 11.0f);
             EXPECT_FLOAT_EQ(targetH[0].z, 0.0f);
                        
-            EXPECT_FLOAT_EQ(targetH[1].x, 0.0f);
-            EXPECT_FLOAT_EQ(targetH[1].y, 14.14213562f);
+            EXPECT_FLOAT_EQ(targetH[1].x, 10.0f);
+            EXPECT_FLOAT_EQ(targetH[1].y, 11.41421356f);
             EXPECT_FLOAT_EQ(targetH[1].z, 0.0f);
             
-            EXPECT_FLOAT_EQ(targetH[2].x, 10.0f);
-            EXPECT_FLOAT_EQ(targetH[2].y, -10.0f);
+            EXPECT_FLOAT_EQ(targetH[2].x, 9.0f);
+            EXPECT_FLOAT_EQ(targetH[2].y, 11.0f);
             EXPECT_FLOAT_EQ(targetH[2].z, 0.0f);
             
-            EXPECT_FLOAT_EQ(targetH[3].x, -10.0f);
-            EXPECT_FLOAT_EQ(targetH[3].y, -10.0f);
+            EXPECT_FLOAT_EQ(targetH[3].x, 9.0f);
+            EXPECT_FLOAT_EQ(targetH[3].y, 9.0f);
             EXPECT_FLOAT_EQ(targetH[3].z, 0.0f);
             
-            EXPECT_FLOAT_EQ(targetH[4].x, 10.0f);
-            EXPECT_FLOAT_EQ(targetH[4].y, 10.0f);
+            EXPECT_FLOAT_EQ(targetH[4].x, 11.0f);
+            EXPECT_FLOAT_EQ(targetH[4].y, 11.0f);
             EXPECT_FLOAT_EQ(targetH[4].z, 0.0f);
         }
 
