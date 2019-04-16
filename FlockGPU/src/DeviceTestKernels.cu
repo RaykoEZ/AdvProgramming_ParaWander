@@ -96,7 +96,6 @@ void testResolveForce(
     float3 * f = thrust::raw_pointer_cast(&_f[0]);
 
     thrust::device_ptr<float> vMax(&_vMax);
-    std::cout<< "Test case count: " << *vMax.get() <<'\n';
 
     callResolveForce<<<1, _pos.size()>>>( pos, v, f, *vMax.get());
     cudaThreadSynchronize();
