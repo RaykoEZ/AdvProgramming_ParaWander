@@ -75,9 +75,6 @@ void FlockSystem::tick()
 {
     if(!h_init) return;
 
-
-
-
     /// We cast to raw ptr for kernel calls
     float3 * pos = thrust::raw_pointer_cast(&d_pos[0]);
     float3 * velocity = thrust::raw_pointer_cast(&d_v[0]);
@@ -209,8 +206,6 @@ void FlockSystem::prepareBoids(const float &_nBoids,
 
     std::uniform_real_distribution<float> vDis(-1.0f, 1.0f);
     std::uniform_real_distribution<float> vMaxDis(1.0f, 10.0f);
-
-
 
     std::vector<float3> posHost;
     std::vector<float3> vHost;

@@ -92,7 +92,7 @@ namespace CPUUnitTests
         /// Boid Tests -------------------------------------------------------------
         TEST(CPU_BoidTest, InitializerTest)
         {
-            World testWorld =  World(1,10,glm::vec3(0.0f));
+            World testWorld =  World(1,10.0f,glm::vec3(0.0f));
 
             unsigned int id = 1;
             float m = 10.0f;
@@ -124,7 +124,7 @@ namespace CPUUnitTests
 
         TEST(CPU_BoidTest, RuntimeTest_Motion_No_Collision)
         {
-            World testWorld =  World(1,10,glm::vec3(0.0f));
+            World testWorld =  World(1,10.0f,glm::vec3(0.0f));
 
             float dt = 1.0f;
             Boid old = testWorld.m_boids[0];
@@ -145,7 +145,7 @@ namespace CPUUnitTests
         TEST(CPU_BoidTest, RuntimeTest_Motion_On_Collision_One_Neighbour)
         {
 
-            World testWorld =  World(1,10,glm::vec3(0.0f));
+            World testWorld =  World(1,10.0f,glm::vec3(0.0f));
 
             glm::vec3 oldP = testWorld.m_boids[0].m_pos;
             unsigned int id = 1;
@@ -212,7 +212,7 @@ namespace CPUUnitTests
 
         TEST(CPU_BoidTest, RunTimeTest_On_Collision_More_Than_One_Neighbour)
         {
-            World testWorld =  World(1,10,glm::vec3(0.0f));
+            World testWorld =  World(1,10.0f,glm::vec3(0.0f));
 
             glm::vec3 oldP = testWorld.m_boids[0].m_pos;
             unsigned int id = 1;

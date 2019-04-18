@@ -1,0 +1,11 @@
+#define FLOCK_RES_LOW 256.0f
+#define FLOCK_RES_MID 1024.0f
+#define FLOCK_RES_HIGH 4096.0f
+
+#define FLOCK_NUMP_LOW 100
+#define FLOCK_NUMP_MID 10000
+#define FLOCK_NUMP_HIGH 100000
+
+#define TIMESTEP 0.01f
+
+

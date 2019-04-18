@@ -151,7 +151,7 @@ int main(int argc, char** argv)
     /// GPU VERSION
     ///
 /*
-    float res = 2048.0f;
+    float res = 1024.0f;
     FlockSystem flockSys(n,10.0f,0.1f,dt,res);
     flockSys.init();
     std::vector<float3> pos;
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
         flockSys.exportResult(pos,col);
     }
 */
-    /// Test run
+    /// Tests
     testing::InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();
 }
