@@ -3,6 +3,10 @@
 *.lo
 *.o
 *.obj
+# Binaries from VSCode
+*.bin
+*.ipch
+
 # qt files
 *.pro.user*
 .qmake*
@@ -66,3 +70,4 @@ CMakeScripts
 Makefile
 cmake_install.cmake
 install_manifest.txt
+Makefile.Test
