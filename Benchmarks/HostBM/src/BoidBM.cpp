@@ -5,19 +5,19 @@
 #include "glm/vec3.hpp"
 
 
-#define HOST_BM_BOID_TICK(BM_NAME, DT)\
-    static void BM_NAME(benchmark::State& state)\
-    {\
-        unsigned int n = 1;\
-        float r = 10.0f;\
-        glm::vec3 p = glm::vec3(0.0f);\
-        World testWorld =  World(n,r,p);\
-        Boid boid = Boid(0,10.0f,glm::vec3(0.0f),glm::vec3(1.0f,0.0f,0.0f),10.0f, &testWorld);\
-        for(auto _ : state)\
-        {\
-            boid.tick(DT);\
-        }\
-    }\
+#define HOST_BM_BOID_TICK(BM_NAME, DT)                                                                  \
+    static void BM_NAME(benchmark::State& state)                                                        \
+    {                                                                                                   \
+        unsigned int n = 1;                                                                             \
+        float r = 10.0f;                                                                                \
+        glm::vec3 p = glm::vec3(0.0f);                                                                  \
+        World testWorld =  World(n,r,p);                                                                \
+        Boid boid = Boid(0,10.0f,glm::vec3(0.0f),glm::vec3(1.0f,0.0f,0.0f),10.0f, &testWorld);          \
+        for(auto _ : state)                                                                             \
+        {                                                                                               \
+            boid.tick(DT);                                                                              \
+        }                                                                                               \
+    }                                                                                                   \
 BENCHMARK(BM_NAME)
 
 
