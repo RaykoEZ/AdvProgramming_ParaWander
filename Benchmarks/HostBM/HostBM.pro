@@ -3,7 +3,6 @@ include($${PWD}/../../common.pri)
 TEMPLATE = app
 TARGET = Flock_HostBM.out
 OBJECTS_DIR=obj
-CUDA_OBJECTS_DIR = cudaobj
 # and add the include dir into the search path for Qt and make
 INCLUDEPATH +=./include \
               $$PWD/../../FlockCPU/include \

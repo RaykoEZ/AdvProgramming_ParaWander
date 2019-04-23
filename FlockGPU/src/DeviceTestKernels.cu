@@ -1,6 +1,6 @@
 #include "DeviceTestKernels.cuh"
-#include <iostream>
-
+#include "Hash.cuh"
+#include "FlockSystem.h"
 
 __global__ void callGridFromPoint( int3 *_gridIdx, float3 *_pt)
 {
@@ -149,3 +149,64 @@ void testFlee(
     callFlee<<<1, _f.size()>>>(f, pos, v, target, *vMax.get());
     cudaThreadSynchronize();
 }
+
+void testNeighbour(
+    const float &_dt,
+    const uint &_numP,
+    const float &_res)
+{
+    FlockSystem flockSys(_numP,10.0f,0.1f,_dt,_res);
+    flockSys.init();
+    thrust::device_vector<uint> d_cellOcc(_numP);d_cellOcc = flockSys.getCellOcc();
+    thrust::device_vector<uint> d_scatter(_numP);d_scatter = flockSys.getScatterAddress();
+    thrust::device_vector<uint> d_hash(_numP);d_hash = flockSys.getHash();
+    thrust::device_vector<bool> d_collision(_numP);d_collision = flockSys.getCollisionFlag();
+    thrust::device_vector<float3> d_pos(_numP); d_pos= flockSys.getPos();
+    thrust::device_vector<float3> d_target(_numP);d_target = flockSys.getTarget();
+
+    float3 * pos = thrust::raw_pointer_cast(&d_pos[0]);
+    float3 * targetPos = thrust::raw_pointer_cast(&d_target[0]);
+    bool * collision = thrust::raw_pointer_cast(&d_collision[0]);
+    uint * cellOcc = thrust::raw_pointer_cast(&d_cellOcc[0]);
+    uint * scatter = thrust::raw_pointer_cast(&d_scatter[0]);
+
+    thrust::fill(d_cellOcc.begin(), d_cellOcc.end(), 0);
+    PointHashOperator hashOp(cellOcc);
+    thrust::transform(d_pos.begin(), d_pos.end(), d_hash.begin(), hashOp);
+
+    thrust::sort_by_key(
+        d_hash.begin(),
+        d_hash.end(),
+        thrust::make_zip_iterator(thrust::make_tuple(d_pos.begin(),
+                                                     d_target.begin()
+        )));
+
+    thrust::exclusive_scan(d_cellOcc.begin(), d_cellOcc.end(), d_scatter.begin());
+    uint maxCellOcc = thrust::reduce(d_cellOcc.begin(), d_cellOcc.end(), 0, thrust::maximum<unsigned int>());
+    uint blockSize = 32 * ceil(maxCellOcc / 32.0f);
+    dim3 gridSize = dim3(_res, _res);
+
+
+    computeAvgNeighbourPos<<<gridSize, blockSize>>>(collision, targetPos, pos, cellOcc, scatter);
+    cudaThreadSynchronize();
+
+}
+
+void testHash(
+    const float &_dt,
+    const uint &_numP,
+    const float &_res)                                                                
+    {                                                                                                           
+        FlockSystem flockSys(_numP,10.0f,0.1f,_dt,_res);                                                           
+        flockSys.init();                                                                                        
+        thrust::device_vector<uint> d_cellOcc = flockSys.getCellOcc();                                          
+        thrust::device_vector<uint> d_scatter = flockSys.getScatterAddress();                                   
+        thrust::device_vector<uint> d_hash = flockSys.getHash();                                                
+        thrust::device_vector<float3> d_pos = flockSys.getPos();                                                
+        uint * cellOcc = thrust::raw_pointer_cast(&d_cellOcc[0]);                                                                          
+        thrust::fill(d_cellOcc.begin(), d_cellOcc.end(), 0);                                                    
+        PointHashOperator hashOp(cellOcc);                                                                      
+                                                                                                     
+        thrust::transform(d_pos.begin(), d_pos.end(), d_hash.begin(), hashOp);                       
+                                                                                                            
+    }                                                                                                           

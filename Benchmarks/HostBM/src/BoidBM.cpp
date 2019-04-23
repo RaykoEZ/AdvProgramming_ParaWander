@@ -38,8 +38,8 @@ BENCHMARK(BM_NAME)
 
 HOST_BM_BOID_TICK(BM_Host_Boid_Update, TIMESTEP);
 
-HOST_BM_BOID_NEIGHBOUR(BM_Host_Boid_NeighbouthoodProcess_Low, FLOCK_NUMP_LOW);
-HOST_BM_BOID_NEIGHBOUR(BM_Host_Boid_NeighbouthoodProcess_Medium, FLOCK_NUMP_MID);
-HOST_BM_BOID_NEIGHBOUR(BM_Host_Boid_NeighbouthoodProcess_High, FLOCK_NUMP_HIGH);
+HOST_BM_BOID_NEIGHBOUR(BM_Host_Boid_Neighbouthood_Search_Low, FLOCK_NUMP_LOW);
+HOST_BM_BOID_NEIGHBOUR(BM_Host_Boid_Neighbouthood_Search_Medium, FLOCK_NUMP_MID);
+HOST_BM_BOID_NEIGHBOUR(BM_Host_Boid_Neighbouthood_Search_High, FLOCK_NUMP_HIGH);
 
 

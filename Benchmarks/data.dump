@@ -1,0 +1,35 @@
+------------------------------------------------------------------------------------
+Benchmark                                         Time             CPU   Iterations
+------------------------------------------------------------------------------------
+BM_Host_Boid_Update                            2473 ns         2465 ns       279871
+BM_Host_Boid_Neighbouthood_Search_Low           362 ns          360 ns      1956059
+BM_Host_Boid_Neighbouthood_Search_Medium     100963 ns       100609 ns         8629
+BM_Host_Boid_Neighbouthood_Search_High       833686 ns       831172 ns          763
+BM_Host_Flock_Seek                             7.75 ns         7.74 ns     89850027
+BM_Host_Flock_Flee                             7.78 ns         7.76 ns     88860763
+BM_Host_Flock_Wander                           2365 ns         2360 ns       297641
+BM_Host_World_Update_Low                     161996 ns       161483 ns        10783
+BM_Host_World_Update_Medium               937107464 ns    933687137 ns            1
+BM_Host_World_Update_High                91502996841 ns   91484476455 ns            1
+
+
+
+---------------------------------------------------------------------------------------
+Benchmark                                            Time             CPU   Iterations
+---------------------------------------------------------------------------------------
+BM_Device_Flock_Flee                              8066 ns         8065 ns        67721
+BM_Device_Flock_Seek                              7970 ns         7970 ns        86753
+BM_Device_Flock_Wander                            8020 ns         8019 ns        85723
+BM_Device_Flock_Integrator                        8296 ns         8295 ns        85123
+BM_Device_Flock_Neighbourhood_Search_Low       2123039 ns      2118815 ns          346
+BM_Device_Flock_Neighbourhood_Search_Medium   16309508 ns     16272656 ns           40
+BM_Device_Flock_Neighbourhood_Search_High    202382618 ns    202348906 ns            3
+BM_Device_Flock_Update_Low                    11012677 ns     11007616 ns           63
+BM_Device_Flock_Update_Medium                 23703594 ns     23695564 ns           29
+BM_Device_Flock_Update_High                  226066462 ns    226015402 ns            3
+BM_Device_Flock_Hash_Low                       1320179 ns      1316252 ns          523
+BM_Device_Flock_Hash_Medium                    7811328 ns      7798642 ns           90
+BM_Device_Flock_Hash_High                     92916362 ns     92887188 ns            8
+
+
+- From Google/benchmark.

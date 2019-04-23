@@ -44,7 +44,13 @@ void testFlee(
     float &_vMax);
 
 
+void testNeighbour(
+    const float &_dt,
+    const uint &_numP,
+    const float &_res);
 
-
-
+void testHash(
+    const float &_dt,
+    const uint &_numP,
+    const float &_res);
 #endif //DEVICETESTKERNELS_CUH

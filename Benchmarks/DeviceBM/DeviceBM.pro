@@ -1,6 +1,5 @@
 include($${PWD}/../../common.pri)
-
-QT      += testlib
+CONFIG += console
 TEMPLATE = app
 TARGET = Flock_DeviceBM.out
 OBJECTS_DIR = obj
@@ -8,7 +7,7 @@ CUDA_OBJECTS_DIR = cudaobj
 # and add the include dir into the search path for Qt and make
 INCLUDEPATH +=./include \
               $$PWD/../../FlockGPU/include \
-              $$PWD/../
+              $$PWD/../include
 
 HEADERS += \
     $$PWD/../../FlockGPU/include/*.h \
@@ -16,6 +15,7 @@ HEADERS += \
     $$PWD/src/*.cuh \
     $$PWD/../include/BenchCommon.h
 
+SOURCES += ./src/main.cpp
 unix:{
    LIBS+= -lbenchmark
 }
