@@ -12,7 +12,25 @@ BM_Host_World_Update_Low                     161996 ns       161483 ns        10
 BM_Host_World_Update_Medium               937107464 ns    933687137 ns            1
 BM_Host_World_Update_High                91502996841 ns   91484476455 ns            1
 
+# Below is run with less background processes running
 
+------------------------------------------------------------------------------------
+Benchmark                                         Time             CPU   Iterations
+------------------------------------------------------------------------------------
+BM_Host_Boid_Update                            2480 ns         2480 ns       251543
+BM_Host_Boid_Neighbouthood_Search_Low           351 ns          351 ns      1936297
+BM_Host_Boid_Neighbouthood_Search_Medium      83227 ns        83222 ns        10634
+BM_Host_Boid_Neighbouthood_Search_High       994219 ns       994164 ns          774
+BM_Host_Flock_Seek                             7.65 ns         7.64 ns     92826699
+BM_Host_Flock_Flee                             7.68 ns         7.68 ns     92145067
+BM_Host_Flock_Wander                           2292 ns         2292 ns       310424
+BM_Host_World_Update_Low                     154439 ns       154431 ns        10838
+BM_Host_World_Update_Medium               909503627 ns    909457154 ns            1
+BM_Host_World_Update_High                90502721641 ns   90496090804 ns            1
+
+
+
+__________________________________________________________________________________________________________
 
 ---------------------------------------------------------------------------------------
 Benchmark                                            Time             CPU   Iterations
@@ -30,6 +48,24 @@ BM_Device_Flock_Update_High                  226066462 ns    226015402 ns       
 BM_Device_Flock_Hash_Low                       1320179 ns      1316252 ns          523
 BM_Device_Flock_Hash_Medium                    7811328 ns      7798642 ns           90
 BM_Device_Flock_Hash_High                     92916362 ns     92887188 ns            8
+
+# Below is run with less background processes running
+---------------------------------------------------------------------------------------
+Benchmark                                            Time             CPU   Iterations
+---------------------------------------------------------------------------------------
+BM_Device_Flock_Flee                              8030 ns         8030 ns        79395
+BM_Device_Flock_Seek                              7910 ns         7910 ns        86657
+BM_Device_Flock_Wander                            8039 ns         8039 ns        87025
+BM_Device_Flock_Integrator                        8473 ns         8473 ns        87579
+BM_Device_Flock_Neighbourhood_Search_Low       1970108 ns      1966043 ns          357
+BM_Device_Flock_Neighbourhood_Search_Medium   14998533 ns     14985416 ns           47
+BM_Device_Flock_Neighbourhood_Search_High    200451571 ns    200403905 ns            3
+BM_Device_Flock_Update_Low                    10998205 ns     10990382 ns           63
+BM_Device_Flock_Update_Medium                 23632444 ns     23619346 ns           30
+BM_Device_Flock_Update_High                  221919901 ns    221908229 ns            3
+BM_Device_Flock_Hash_Low                       1294680 ns      1291877 ns          544
+BM_Device_Flock_Hash_Medium                    7421111 ns      7407935 ns           95
+BM_Device_Flock_Hash_High                     91819165 ns     91796574 ns            8
 
 
 - From Google/benchmark.
