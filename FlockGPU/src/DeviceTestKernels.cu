@@ -157,12 +157,23 @@ void testNeighbour(
 {
     FlockSystem flockSys(_numP,10.0f,0.1f,_dt,_res);
     flockSys.init();
-    thrust::device_vector<uint> d_cellOcc(_numP);d_cellOcc = flockSys.getCellOcc();
-    thrust::device_vector<uint> d_scatter(_numP);d_scatter = flockSys.getScatterAddress();
-    thrust::device_vector<uint> d_hash(_numP);d_hash = flockSys.getHash();
-    thrust::device_vector<bool> d_collision(_numP);d_collision = flockSys.getCollisionFlag();
-    thrust::device_vector<float3> d_pos(_numP); d_pos= flockSys.getPos();
-    thrust::device_vector<float3> d_target(_numP);d_target = flockSys.getTarget();
+    thrust::device_vector<uint> d_cellOcc(_numP);
+    d_cellOcc = flockSys.getCellOcc();
+
+    thrust::device_vector<uint> d_scatter(_numP);
+    d_scatter = flockSys.getScatterAddress();
+
+    thrust::device_vector<uint> d_hash(_numP);
+    d_hash = flockSys.getHash();
+
+    thrust::device_vector<bool> d_collision(_numP);
+    d_collision = flockSys.getCollisionFlag();
+
+    thrust::device_vector<float3> d_pos(_numP); 
+    d_pos= flockSys.getPos();
+    
+    thrust::device_vector<float3> d_target(_numP);
+    d_target = flockSys.getTarget();
 
     float3 * pos = thrust::raw_pointer_cast(&d_pos[0]);
     float3 * targetPos = thrust::raw_pointer_cast(&d_target[0]);

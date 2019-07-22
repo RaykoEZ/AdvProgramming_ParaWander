@@ -69,3 +69,21 @@ BM_Device_Flock_Hash_High                     91819165 ns     91796574 ns       
 
 
 - From Google/benchmark.
+
+Approximate Memory overheads:
+
+BM_Device_Overhead_Bool_Copy_Low                241581 ns       239610 ns         2832
+BM_Device_Overhead_Bool_Copy_Mid                255968 ns       254595 ns         2769
+BM_Device_Overhead_Bool_Copy_High               386756 ns       385252 ns         1829
+BM_Device_Overhead_Uint_Copy_Low                224134 ns       222835 ns         3166
+BM_Device_Overhead_Uint_Copy_Mid                235569 ns       234256 ns         3010
+BM_Device_Overhead_Uint_Copy_High               319745 ns       318337 ns         2220
+BM_Device_Overhead_Float_Copy_Low               238175 ns       224594 ns         3149
+BM_Device_Overhead_Float_Copy_Mid               242924 ns       241497 ns         2767
+BM_Device_Overhead_Float_Copy_High              317725 ns       316132 ns         2227
+BM_Device_Overhead_Float3_Copy_Low              224151 ns       222757 ns         3154
+BM_Device_Overhead_Float3_Copy_Mid              256556 ns       255125 ns         2769
+BM_Device_Overhead_Float3_Copy_High             490241 ns       488621 ns         1443
+BM_Device_Overhead_Initialize_Low               904289 ns       899272 ns          773
+BM_Device_Overhead_Initialize_Mid              2813170 ns      2806426 ns          252
+BM_Device_Overhead_Initialize_High            21797464 ns     21768150 ns           32

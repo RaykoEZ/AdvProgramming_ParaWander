@@ -2,7 +2,7 @@
 #include "FlockActions.cuh"
 #include "FlockParams.cuh"
 #include "FlockUtil.cuh"
-#include "DebugUtil.cuh"
+
 __global__ void computeAvgNeighbourPos(
     bool *_collision, 
     float3 *_target, 

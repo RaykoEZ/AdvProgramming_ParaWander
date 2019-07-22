@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>5</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>525</x>
+      <y>255</y>
+      <w>125</w>
+      <h>65</h>
+    </coordinates>
+    <panel_attributes>HashingOperator
+--
+
+- m_cellOccupancy : uint*
+
+--
+
++ hashing() : uint</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>110</x>
+      <y>715</y>
+      <w>275</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>Flock Functions
+--
+
+-d- boidWanderPattern( _angle : float, _v : float3, _pos : float3) : float3
+
+-d- boidSeekPattern( _pos : float3, _v : float3, _target : float3, _vMax : float) : float3
+
+-d- boidFleePattern( _pos : float3, _v : float3, _target : float3, _vMax : float) : float3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>110</x>
+      <y>145</y>
+      <w>115</w>
+      <h>80</h>
+    </coordinates>
+    <panel_attributes>Constant Definitions
+--
+
+- degree_to_radians : float
+- pi : float
+- default_timestep : float
+- default_mass : float
+- default_inv_mass : float
+- default_resolution : float
+- default_vMax : float
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>90</x>
+      <y>480</y>
+      <w>145</w>
+      <h>215</h>
+    </coordinates>
+    <panel_attributes>Flock Kernels
+--
+
+-g- computeAvgNeighbourPos(
+	_collision : bool *, 
+	_target : float3 *, 
+	_pos : float3 *, 
+	_cellOcc : uint *, 
+	_scatterAddress : uint *): void
+
+-g- genericBehaviour(
+ 	_v : float3 *, 
+ 	_col : float3 *, 
+ 	_target : float3 *, 
+ 	_pos : float3 *, 
+ 	_collision : bool *, 
+ 	_cellOcc : uint *, 
+ 	_scatterAddress : uint *, 
+  	_angle : float *, 
+   _vMax : float *): void
+
+-d- resolveForce(
+	_pos : float3 , 
+	_v : float3 , 
+	_f : float3 , 
+	_vMax : float ): float3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>110</x>
+      <y>240</y>
+      <w>150</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Flock Parameters
+--
+
+- m_numBoids : uint 
+- m_res : uint
+- m_res2 : uint
+- m_invRes : float
+- m_invRes2 : float
+- m_collisionRad : float 
+- m_mass : float
+- m_invMass : float
+- m_vMax : float
+- m_dt : float
+
+--
+
++ get&lt;member&gt;() : &lt;memberType&gt;
+
++ set&lt;membet&gt;(val : &lt;memberType&gt;) : void
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>250</x>
+      <y>175</y>
+      <w>185</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>Randomizer
+--
+
+randomFloats(seed : uint, out : float*, n : uint): void  </panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>285</x>
+      <y>245</y>
+      <w>225</w>
+      <h>290</h>
+    </coordinates>
+    <panel_attributes>Flock System
+--
+ # h_init : bool
+ # h_frameCount : uint
+ # h_blockSize : uint
+ # h_gridSize : dim3 
+ # d_isThereCollision : device_vector&lt;bool&gt;
+ # d_hash : device_vector&lt;uint&gt;
+ # d_cellOcc : device_vector&lt;uint&gt;
+ # d_scatterAddress : device_vector&lt;uint&gt; 
+ # d_vMax : device_vector&lt;float&gt;
+ # d_angle : device_vector&lt;float&gt; 
+ # d_col : device_vector&lt;float3&gt;
+ # d_pos : device_vector&lt;float3&gt;
+ # d_v : device_vector&lt;float3&gt; 
+ # d_target : device_vector&lt;float3&gt; 
+ -  h_params : FlockParameter*
+ 
+--
+
++ get&lt;host_member&gt;() : &lt;host_memberType&gt;
+
++ get&lt;device_member&gt;() : &lt;host_memberType&gt;
+
++ init() : void
+
++ tick() : void
+
++ exportResult( _posh : vector&lt;float3&gt;, _colh : vector&lt;float3&gt;) : void
+
+# clear() : void
+
+# prepareBoids(
+	_nBoids : float,
+ 	_minX : float, _minY : float,
+ 	_maxX : float, _maxY : float) : void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>500</x>
+      <y>565</y>
+      <w>180</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>Flock Utility
+--
+
+-d- gridFromPoint( pt : float3) : int3
+
+-d- cellFromGrid( grid : uint3) : uint
+
+-d- cellFromGrid( grid : int3) : uint
+
+-d- dist2( _pos1 : float3,   _pos2 : float3) : float
+
+-d- rotateZ( _v : float3,   _angle : float) : float3</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>220</y>
+      <w>15</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>255</x>
+      <y>285</y>
+      <w>40</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
+    <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>165</x>
+      <y>690</y>
+      <w>15</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>230</x>
+      <y>530</y>
+      <w>115</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;100.0;210.0;100.0;210.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>505</x>
+      <y>280</y>
+      <w>30</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>40.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>585</x>
+      <y>315</y>
+      <w>15</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;500.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>530</y>
+      <w>160</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>300.0;190.0;10.0;190.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>335</x>
+      <y>210</y>
+      <w>15</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>380</x>
+      <y>670</y>
+      <w>190</w>
+      <h>100</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>360.0;10.0;360.0;180.0;10.0;180.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>160</x>
+      <y>395</y>
+      <w>350</w>
+      <h>260</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;110.0;230.0;110.0;230.0;500.0;680.0;500.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>170</x>
+      <y>395</y>
+      <w>15</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;170.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>60</x>
+      <y>110</y>
+      <w>630</w>
+      <h>700</h>
+    </coordinates>
+    <panel_attributes>FlockGPU
+--
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>685</x>
+      <y>385</y>
+      <w>110</w>
+      <h>20</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;&lt;-
+Export as .geo</panel_attributes>
+    <additional_attributes>200.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLPackage</id>
+    <coordinates>
+      <x>785</x>
+      <y>375</y>
+      <w>65</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Houdini
+--
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

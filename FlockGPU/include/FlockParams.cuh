@@ -2,24 +2,32 @@
 #define FLOCKPARAMS_CUH
 
 #include "FlockDefines.h"
-/// Struct for storing constants into the GPU
-
+///@brief Struct for storing constants into the GPU
 struct FlockData
 {
+    ///@brief number of boids in the world
     unsigned int m_numBoids;
+    ///@brief resolution of the square hash grid
     unsigned int m_res;
+    ///@brief resolution squared, usually used for number of grids in the world grid
     unsigned int m_res2;
+    ///@brief inversion of res
     float m_invRes;
+    ///@brief inversion of res2
     float m_invRes2;
+    ///@brief collisionRadius
     float m_collisionRad;
-
+    ///@brief mass of boid
     float m_mass;
+    ///@brief inversion of mass
     float m_invMass;
+    ///@brief default velocity limit of all boids 
     float m_vMax;
+    ///@brief timestep of the world, used for update
     float m_dt;
     
 };
-
+///@brief define constant memory prototype here
 extern __constant__ FlockData paramData;
 
 /// Class to manage the storage
@@ -27,17 +35,19 @@ extern __constant__ FlockData paramData;
 class FlockParams
 {
 public:
+    ///@brief ctor 
     FlockParams(
     const unsigned int &_numB,
     const float &_m,
     const float &_vMax,
     const float &_dt,
     const unsigned int &_res);
-
+    ///@brief dtor
     ~FlockParams(){}
-
+    ///@brief handle initial memory allocation and boid generation 
     void init();
 
+    ///@brief getters to host from members in device memory
     unsigned int getNumBoids() const { return m_data.m_numBoids;}
 
     unsigned int getRes() const { return m_data.m_res;}
@@ -59,7 +69,7 @@ public:
     float getCollisionRad() const {return m_data.m_collisionRad;}
 
 
-    /// Recalculates res2 and their inversions
+    ///@brief Setters for members, some are in constant memory
     void setRes(const unsigned int &_res);
 
     void setNumBoids(const unsigned int &_numB);
@@ -74,7 +84,7 @@ public:
 
     void setCollisionRad(const float &_rad);
 protected:
-
+    /// @brief data to be sent to constant memory
     FlockData m_data;
 
 };

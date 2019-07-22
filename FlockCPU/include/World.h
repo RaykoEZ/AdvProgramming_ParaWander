@@ -29,7 +29,9 @@ public:
     ~World(){}
 
 public:
-    // Called every frame
+    /// @brief update world
+    /// @param [in] _dt Timestep
+    /// @return Vector Data to be exported for .geo 
     BoidData tick(const float &_dt);
     /// @brief Radius of the simulation world
     float m_worldRad;

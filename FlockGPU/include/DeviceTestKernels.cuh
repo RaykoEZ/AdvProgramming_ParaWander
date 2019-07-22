@@ -2,7 +2,7 @@
 #define DEVICETESTKERNELS_CUH
 #include "FlockKernels.cuh"
 #include "FlockUtil.cuh"
-
+/// @file Functions for testing and benchmarking for devce functionalities
 
 __global__ void callGridFromPoint(int3 *_gridIdx, float3 *_pt);
 __global__ void callCellFromGrid( uint *_cellIdx, int3 *_grid);

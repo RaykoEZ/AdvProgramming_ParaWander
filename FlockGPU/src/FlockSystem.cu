@@ -1,6 +1,5 @@
 #include "FlockSystem.h"
 #include "Hash.cuh"
-#include "DebugUtil.cuh"
 #include <random>
 #include <iostream>
 #include "FlockParams.cuh"
